@@ -1,0 +1,10 @@
+<div class="form-group">
+    @php $options={{selectOptions}} @endphp
+    <label for="{{$fieldName}}">{{$fieldName}}</label>
+    <select class="form-control" id="{{$fieldName}}" name="{{$fieldName}}">
+        <option value="">Select {{$fieldName}}</option>
+        @foreach ($options as $key => $value)
+            <option value="{{$key}}">{{$value}}</option>
+        @endforeach
+    </select>
+</div>

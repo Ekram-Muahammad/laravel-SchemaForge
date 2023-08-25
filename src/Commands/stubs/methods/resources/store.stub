@@ -1,0 +1,13 @@
+public function store(Request $request)
+{
+
+    $request->validate([
+        {{validationLogic}}
+    ]);
+
+    $record ={{ModelName}}::create([
+        {{StoreLogic}}
+    ]); // Adjust the model name
+
+    return redirect()->route('{{tableName}}.index')->with('success', 'Record created successfully.');
+}

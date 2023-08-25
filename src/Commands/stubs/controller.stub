@@ -1,0 +1,18 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\{{ModelName}}; // Adjust the namespace as needed
+
+class {{ControllerName}} extends Controller
+{
+    {{indexMethod}}
+    {{showMethod}}
+    {{createMethod}}
+    {{storeMethod}}
+    {{editMethod}}
+    {{updateMethod}}
+    {{destroyMethod}}
+}

@@ -1,0 +1,16 @@
+public function store(Request $request)
+{
+
+    $request->validate([
+        {{validationLogic}}
+    ]);
+
+    $record ={{ModelName}}::create([
+        {{StoreLogic}}
+    ]); // Adjust the model name
+
+    return response()->json([
+            'status' => 'success',
+            'message' => 'Record created successfully'
+    ], 201);
+}

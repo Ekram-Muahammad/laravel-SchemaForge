@@ -1,0 +1,16 @@
+public function update(Request $request,{{ModelName}} ${{varName}})
+{
+
+    $request->validate([
+        {{validationLogic}}
+    ]);
+
+    ${{varName}}>update([
+        {{UpdateLogic}}
+    ]); // Adjust the model name
+
+     return response()->json([
+            'status' => 'success',
+            'message' => 'Record updated successfully'
+    ], 200);
+}

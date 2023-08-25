@@ -1,0 +1,6 @@
+public function destroy({{ModelName}} ${{varName}})
+{
+    ${{varName}}->delete();
+
+    return redirect()->route('{{tableName}}.index')->with('success', 'Record deleted successfully.');
+}

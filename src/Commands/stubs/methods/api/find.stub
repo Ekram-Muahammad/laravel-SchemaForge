@@ -1,0 +1,10 @@
+public function find($id)
+{
+    $record = {{ModelName}}::findOrFail($id); // Adjust the model name
+
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $record
+    ], 200);
+}

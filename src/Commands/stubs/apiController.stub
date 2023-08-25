@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\{{ModelName}}; // Adjust the namespace as needed
+
+class {{ControllerName}} extends Controller
+{
+    {{find}}
+    {{findAll}}
+    {{store}}
+    {{update}}
+    {{delete}}
+
+}

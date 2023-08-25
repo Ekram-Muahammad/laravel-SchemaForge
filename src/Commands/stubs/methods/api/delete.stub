@@ -1,0 +1,9 @@
+public function delete({{ModelName}} ${{varName}})
+{
+    ${{varName}}->delete();
+
+     return response()->json([
+            'status' => 'success',
+            'message' => 'Record deleted successfully'
+    ], 200);
+}

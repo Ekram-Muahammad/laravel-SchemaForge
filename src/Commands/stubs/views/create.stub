@@ -1,0 +1,11 @@
+@extends('layouts.dashboard')
+@section('content')
+<div class="container">
+    <h1>Create {{tableName}}</h1>
+    <form class="col-md-6" action="{{ route('{{tableName}}.store') }}" method="POST">
+        @csrf
+        {{formFields}}
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+</div>
+ @endsection

@@ -1,0 +1,25 @@
+{
+    "name": "ekram/artisan-crud",
+    "description": "Laravel Package to create crud operation",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ekram\\ArtisanCrud\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "EkramAminTornet",
+            "email": "114848248+EkramAminTornet@users.noreply.github.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "Laravel" : {
+            "providers" : [
+                "Ekram\\ArtisanCrud\\ArtisanCrudServiceProvider"
+            ]
+        }
+    }
+}

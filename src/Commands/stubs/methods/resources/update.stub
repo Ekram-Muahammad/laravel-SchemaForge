@@ -1,0 +1,13 @@
+public function update(Request $request,{{ModelName}} ${{varName}})
+{
+
+    $request->validate([
+        {{validationLogic}}
+    ]);
+
+    ${{varName}}->update([
+        {{UpdateLogic}}
+    ]); // Adjust the model name
+
+    return redirect()->route('{{tableName}}.index')->with('success', 'Record updated successfully.');
+}

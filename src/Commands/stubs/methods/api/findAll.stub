@@ -1,0 +1,9 @@
+public function findAll()
+{
+    $records = {{ModelName}}::paginate(10); // Adjust the model name and pagination as needed
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $records
+    ], 200);
+}
