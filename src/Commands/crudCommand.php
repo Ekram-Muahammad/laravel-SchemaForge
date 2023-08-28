@@ -12,43 +12,48 @@ use Illuminate\Support\Facades\DB;
 
 class CrudCommand extends Command
 {
-    protected $signature = 'crud';
+    protected $signature = 'make:crud {jsonFile}';
 
     protected $description = 'Create a Crud Operation';
 
     public function handle()
     {
-        $tableName = $this->ask('Enter the table name');
+
         $fields = [];
+
         $relationships = [];
 
-        while (true) {
-            $fieldName = $this->ask('Enter field name (or type "done" to finish)');
+        $jsonFile = $this->argument('jsonFile');
 
-            if ($fieldName === 'done') {
-                break;
-            }
+        $jsonFile = file_get_contents(base_path('/cruds/' . $jsonFile . '.json'));
 
-            $fieldType = $this->choice('Select the field type', ['bigIncrements', 'bigInteger', 'foreign', 'string', 'text', 'binary', 'boolean', 'char', 'date', 'dateTime', 'decimal', 'double', 'enum', 'float', 'geometry', 'geometryCollection', 'increments', 'integer', 'ipAddress', 'json', 'jsonb', 'lineString', 'longText', 'macAddress', 'mediumIncrements', 'mediumInteger', 'mediumText', 'morphs', 'multiLineString', 'multiPoint', 'multiPolygon', 'nullableMorphs', 'nullableTimestamps', 'point', 'polygon', 'rememberToken', 'set', 'smallIncrements', 'smallInteger', 'softDeletes', 'time', 'timestamp', 'tinyIncrements', 'tinyInteger', 'timestamps', 'uuid']);
+        $jsonData = json_decode($jsonFile, true);
+
+        $tableName = $jsonData['tableName'];
+
+        //        $this->info($jsonData['columns'][0]['name']);
+
+        $columns = $jsonData['columns'];
+
+        foreach ($columns as $column) {
 
             $fieldProperties = [];
+            $fieldName = $column['name'];
+            $fieldType = $column['type'];
+            $defaultValue = $column['defaultValue'];
+            $nullable = $column['nullable'];
+            $unique = $column['unique'];
+            $index = $column['index'];
 
-            // Set specific properties based on field type
             if (in_array($fieldType, ['string', 'char', 'text'])) {
-                $fieldProperties['length'] = $this->ask('Enter the field length', 255);
+                $fieldProperties['length'] = $column['length'];
             } elseif ($fieldType === 'decimal') {
-                $fieldProperties['precision'] = $this->ask('Enter the precision', 10);
-                $fieldProperties['scale'] = $this->ask('Enter the scale', 2);
+                $fieldProperties['precision'] = $column['length'];
+                $fieldProperties['scale'] = $column['precision'];
             } elseif ($fieldType === 'enum') {
-                $enumValues = $this->ask('Enter enum values (comma-separated)');
+                $enumValues = $column['values'];
                 $fieldProperties['enumValues'] = explode(',', $enumValues);
             }
-
-            $defaultValue = $this->ask('Enter the default value (leave empty for no default)');
-
-            $nullable = $this->confirm('Is this field nullable?', false);
-            $unique = $this->confirm('Should this field be unique?', false);
-            $index = $this->choice('Select an index option', ['none', 'index', 'unique'], 'none');
 
             $hasRelation = false;
 
@@ -58,12 +63,12 @@ class CrudCommand extends Command
                 $hasRelation = true;
             } else {
                 // to morph
-                $hasRelation = $this->confirm('is this field has a relation');
+                $hasRelation = $column['hasRelation'];
             }
 
             if ($hasRelation) {
                 // generate model relations
-                $relationType = $this->choice("Select relation type for field '{$fieldName}'", ['belongsTo', 'hasOne', 'hasMany', 'hasManyThrough', 'belongsToMany', 'morphTo', 'morphMany', 'morphToMany', 'morphedByMany'], 0);
+                $relationType = $column['relationType'];
 
                 $relatedTable = '';
                 $primaryKey = '';
@@ -71,12 +76,12 @@ class CrudCommand extends Command
                 if ($relationType == 'morphTo') {
                     $relatedModelName = $fieldName;
                 } elseif ($relationType == 'hasManyThrough') {
-                    $intermediateModel = $this->ask('Enter the intermediate model name');
-                    $targetModel = $this->ask('Enter the target model name');
+                    $intermediateModel = $column['intermediateModel'];
+                    $targetModel = $column['targetModel'];
                     $relatedModelName = $fieldName;
                 } else {
-                    $relatedTable = $this->ask('Enter the related table name');
-                    $primaryKey = $this->ask('Enter the primary key of the related table', 'id');
+                    $relatedTable = $column['relatedTable'];
+                    $primaryKey = $column['primaryKey'];
                     // Generate related model name
                     $relatedModelName = Str::studly(Str::ucfirst($relatedTable));
                 }
@@ -94,7 +99,84 @@ class CrudCommand extends Command
             } else {
                 $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
             }
+
         }
+
+
+
+        // while (true) {
+        //     $fieldName = $this->ask('Enter field name (or type "done" to finish)');
+
+        //     if ($fieldName === 'done') {
+        //         break;
+        //     }
+
+        //     $fieldType = $this->choice('Select the field type', ['bigIncrements', 'bigInteger', 'foreign', 'string', 'text', 'binary', 'boolean', 'char', 'date', 'dateTime', 'decimal', 'double', 'enum', 'float', 'geometry', 'geometryCollection', 'increments', 'integer', 'ipAddress', 'json', 'jsonb', 'lineString', 'longText', 'macAddress', 'mediumIncrements', 'mediumInteger', 'mediumText', 'morphs', 'multiLineString', 'multiPoint', 'multiPolygon', 'nullableMorphs', 'nullableTimestamps', 'point', 'polygon', 'rememberToken', 'set', 'smallIncrements', 'smallInteger', 'softDeletes', 'time', 'timestamp', 'tinyIncrements', 'tinyInteger', 'timestamps', 'uuid']);
+
+        //     $fieldProperties = [];
+
+        //     // Set specific properties based on field type
+        //     if (in_array($fieldType, ['string', 'char', 'text'])) {
+        //         $fieldProperties['length'] = $this->ask('Enter the field length', 255);
+        //     } elseif ($fieldType === 'decimal') {
+        //         $fieldProperties['precision'] = $this->ask('Enter the precision', 10);
+        //         $fieldProperties['scale'] = $this->ask('Enter the scale', 2);
+        //     } elseif ($fieldType === 'enum') {
+        //         $enumValues = $this->ask('Enter enum values (comma-separated)');
+        //         $fieldProperties['enumValues'] = explode(',', $enumValues);
+        //     }
+
+        //     $defaultValue = $this->ask('Enter the default value (leave empty for no default)');
+
+        //     $nullable = $this->confirm('Is this field nullable?', false);
+        //     $unique = $this->confirm('Should this field be unique?', false);
+        //     $index = $this->choice('Select an index option', ['none', 'index', 'unique'], 'none');
+
+        //     $hasRelation = false;
+
+        //     $isForeignKey = $fieldType == 'foreign' ? true : false;
+
+        //     if ($isForeignKey) {
+        //         $hasRelation = true;
+        //     } else {
+        //         // to morph
+        //         $hasRelation = $this->confirm('is this field has a relation');
+        //     }
+
+        //     if ($hasRelation) {
+        //         // generate model relations
+        //         $relationType = $this->choice("Select relation type for field '{$fieldName}'", ['belongsTo', 'hasOne', 'hasMany', 'hasManyThrough', 'belongsToMany', 'morphTo', 'morphMany', 'morphToMany', 'morphedByMany'], 0);
+
+        //         $relatedTable = '';
+        //         $primaryKey = '';
+
+        //         if ($relationType == 'morphTo') {
+        //             $relatedModelName = $fieldName;
+        //         } elseif ($relationType == 'hasManyThrough') {
+        //             $intermediateModel = $this->ask('Enter the intermediate model name');
+        //             $targetModel = $this->ask('Enter the target model name');
+        //             $relatedModelName = $fieldName;
+        //         } else {
+        //             $relatedTable = $this->ask('Enter the related table name');
+        //             $primaryKey = $this->ask('Enter the primary key of the related table', 'id');
+        //             // Generate related model name
+        //             $relatedModelName = Str::studly(Str::ucfirst($relatedTable));
+        //         }
+
+        //         $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+
+        //         $relationships[] = [
+        //             'relationName' => Str::lower(Str::singular($relatedModelName)),
+        //             'fieldName' => $fieldName,
+        //             'relationType' => $relationType,
+        //             'relatedModelName' => $relatedModelName,
+        //             'intermediateModel' => $intermediateModel ?? null,
+        //             'targetModel' => $targetModel ?? null,
+        //         ];
+        //     } else {
+        //         $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+        //     }
+        // }
 
         if (!empty($fields)) {
             $migrationName = date('Y_m_d_His') . '_create_' . $tableName . '_table';
@@ -823,7 +905,7 @@ class CrudCommand extends Command
 
             $dom = new \DOMDocument();
 
-            $dom->loadHTML($dashboardContent,LIBXML_NOERROR);
+            $dom->loadHTML($dashboardContent, LIBXML_NOERROR);
 
             $divId = 'nav-menu'; // Replace with your actual div ID
             $specificDiv = $dom->getElementById($divId);
@@ -836,7 +918,7 @@ class CrudCommand extends Command
 
             $modifiedHtmlContent = $dom->saveHTML();
 
-            $modifiedHtmlContent=str_replace(["%7B%7B","%7D%7D","%20"],["{{","}}",""],$modifiedHtmlContent);
+            $modifiedHtmlContent = str_replace(["%7B%7B", "%7D%7D", "%20"], ["{{", "}}", ""], $modifiedHtmlContent);
 
             // Step 3: Write Modified Content
             File::put($dashboardPath, $modifiedHtmlContent);
