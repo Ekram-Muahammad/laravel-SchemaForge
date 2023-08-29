@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Ekram\ArtisanCrud\Helpers\Migration;
 use Ekram\ArtisanCrud\Helpers\Model;
+use Ekram\ArtisanCrud\Helpers\Field;
 
 class CrudCommand extends Command {
     protected $signature = 'make:crud {jsonFile}';
@@ -35,146 +36,11 @@ class CrudCommand extends Command {
 
         $columns = $jsonData[ 'columns' ];
 
-        foreach ( $columns as $column ) {
+        $field=new Field();
+        $data=$field->generateFields($columns);
 
-            $fieldProperties = [];
-            $fieldName = $column[ 'name' ];
-            $fieldType = $column[ 'type' ];
-            $defaultValue = $column[ 'defaultValue' ];
-            $nullable = $column[ 'nullable' ];
-            $unique = $column[ 'unique' ];
-            $index = $column[ 'index' ];
-
-            if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
-                $fieldProperties[ 'length' ] = $column[ 'length' ];
-            } elseif ( $fieldType === 'decimal' ) {
-                $fieldProperties[ 'precision' ] = $column[ 'length' ];
-                $fieldProperties[ 'scale' ] = $column[ 'precision' ];
-            } elseif ( $fieldType === 'enum' ) {
-                $enumValues = $column[ 'values' ];
-                $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
-            }
-
-            $hasRelation = false;
-
-            $isForeignKey = $fieldType == 'foreign' ? true : false;
-
-            if ( $isForeignKey ) {
-                $hasRelation = true;
-            } else {
-                // to morph
-                $hasRelation = $column[ 'hasRelation' ];
-            }
-
-            if ( $hasRelation ) {
-                // generate model relations
-                $relationType = $column[ 'relationType' ];
-
-                $relatedTable = '';
-                $primaryKey = '';
-
-                if ( $relationType == 'morphTo' ) {
-                    $relatedModelName = $fieldName;
-                } elseif ( $relationType == 'hasManyThrough' ) {
-                    $intermediateModel = $column[ 'intermediateModel' ];
-                    $targetModel = $column[ 'targetModel' ];
-                    $relatedModelName = $fieldName;
-                } else {
-                    $relatedTable = $column[ 'relatedTable' ];
-                    $primaryKey = $column[ 'primaryKey' ];
-                    // Generate related model name
-                    $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
-                }
-
-                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
-
-                $relationships[] = [
-                    'relationName' => Str::lower( Str::singular( $relatedModelName ) ),
-                    'fieldName' => $fieldName,
-                    'relationType' => $relationType,
-                    'relatedModelName' => $relatedModelName,
-                    'intermediateModel' => $intermediateModel ?? null,
-                    'targetModel' => $targetModel ?? null,
-                ];
-            } else {
-                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
-            }
-
-        }
-
-        // while ( true ) {
-        //     $fieldName = $this->ask( 'Enter field name (or type "done" to finish)' );
-
-        //     if ( $fieldName === 'done' ) {
-        //         break;
-        //     }
-
-        //     $fieldType = $this->choice( 'Select the field type', [ 'bigIncrements', 'bigInteger', 'foreign', 'string', 'text', 'binary', 'boolean', 'char', 'date', 'dateTime', 'decimal', 'double', 'enum', 'float', 'geometry', 'geometryCollection', 'increments', 'integer', 'ipAddress', 'json', 'jsonb', 'lineString', 'longText', 'macAddress', 'mediumIncrements', 'mediumInteger', 'mediumText', 'morphs', 'multiLineString', 'multiPoint', 'multiPolygon', 'nullableMorphs', 'nullableTimestamps', 'point', 'polygon', 'rememberToken', 'set', 'smallIncrements', 'smallInteger', 'softDeletes', 'time', 'timestamp', 'tinyIncrements', 'tinyInteger', 'timestamps', 'uuid' ] );
-
-        //     $fieldProperties = [];
-
-        //     // Set specific properties based on field type
-        //     if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
-        //         $fieldProperties[ 'length' ] = $this->ask( 'Enter the field length', 255 );
-        //     } elseif ( $fieldType === 'decimal' ) {
-        //         $fieldProperties[ 'precision' ] = $this->ask( 'Enter the precision', 10 );
-        //         $fieldProperties[ 'scale' ] = $this->ask( 'Enter the scale', 2 );
-        //     } elseif ( $fieldType === 'enum' ) {
-        //         $enumValues = $this->ask( 'Enter enum values (comma-separated)' );
-        //         $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
-        //     }
-
-        //     $defaultValue = $this->ask( 'Enter the default value (leave empty for no default)' );
-
-        //     $nullable = $this->confirm( 'Is this field nullable?', false );
-        //     $unique = $this->confirm( 'Should this field be unique?', false );
-        //     $index = $this->choice( 'Select an index option', [ 'none', 'index', 'unique' ], 'none' );
-
-        //     $hasRelation = false;
-
-        //     $isForeignKey = $fieldType == 'foreign' ? true : false;
-
-        //     if ( $isForeignKey ) {
-        //         $hasRelation = true;
-        //     } else {
-        //         // to morph
-        //         $hasRelation = $this->confirm( 'is this field has a relation' );
-        //     }
-
-        //     if ( $hasRelation ) {
-        //         // generate model relations
-        //         $relationType = $this->choice( "Select relation type for field '{$fieldName}'", [ 'belongsTo', 'hasOne', 'hasMany', 'hasManyThrough', 'belongsToMany', 'morphTo', 'morphMany', 'morphToMany', 'morphedByMany' ], 0 );
-
-        //         $relatedTable = '';
-        //         $primaryKey = '';
-
-        //         if ( $relationType == 'morphTo' ) {
-        //             $relatedModelName = $fieldName;
-        //         } elseif ( $relationType == 'hasManyThrough' ) {
-        //             $intermediateModel = $this->ask( 'Enter the intermediate model name' );
-        //             $targetModel = $this->ask( 'Enter the target model name' );
-        //             $relatedModelName = $fieldName;
-        //         } else {
-        //             $relatedTable = $this->ask( 'Enter the related table name' );
-        //             $primaryKey = $this->ask( 'Enter the primary key of the related table', 'id' );
-        //             // Generate related model name
-        //             $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
-        //         }
-
-        //         $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
-
-        //         $relationships[] = [
-        //             'relationName' => Str::lower( Str::singular( $relatedModelName ) ),
-        //             'fieldName' => $fieldName,
-        //             'relationType' => $relationType,
-        //             'relatedModelName' => $relatedModelName,
-        //             'intermediateModel' => $intermediateModel ?? null,
-        //             'targetModel' => $targetModel ?? null,
-        // ];
-        //     } else {
-        //         $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
-        //     }
-        // }
+        $fields=$data['fields'];
+        $relationships=$data['relationships'];
 
         if ( !empty( $fields ) ) {
 
@@ -182,9 +48,9 @@ class CrudCommand extends Command {
 
             $migrationController->generateMigrationContent( $tableName, $fields );
 
-            $modelController = new Model();
+            $modelController=new Model();
 
-            $modelController->generateModel( $tableName, $fields, $modelName, $relationships );
+            $modelController->generateModel($tableName, $fields,$modelName,$relationships);
 
             // create seeder
 
@@ -814,16 +680,13 @@ class CrudCommand extends Command {
         $indexContent = str_replace([' {
         {
             tableName}
-        }
-        ', ' {
+        }', ' {
             {
                 headers}
-            }
-            ', ' {
+            }', ' {
                 {
                     records}
-                }
-                '], [$tableName, $headers, $records], $indexViewStub);
+                }'], [$tableName, $headers, $records], $indexViewStub);
 
         File::put("{$viewsDirectory}/index.blade.php", $indexContent);
 
@@ -854,16 +717,13 @@ class CrudCommand extends Command {
         $showContent = str_replace([' {
                     {
                         tableName}
-                    }
-                    ', ' {
+                    }', ' {
                         {
                             headers}
-                        }
-                        ', ' {
+                        }', ' {
                             {
                                 fields}
-                            }
-                            '], [$tableName, $headers, $data], $showViewStub);
+                            }'], [$tableName, $headers, $data], $showViewStub);
 
         File::put("{$viewsDirectory}/show.blade.php", $showContent);
 
@@ -912,28 +772,23 @@ class CrudCommand extends Command {
         $createView = str_replace([' {
                                 {
                                     tableName}
-                                }
-                                ', ' {
+                                }', ' {
                                     {
                                         formFields}
-                                    }
-                                    '], [$tableName, $formFields], $createStub);
+                                    }'], [$tableName, $formFields], $createStub);
 
 
         $updateStub = File::get(__DIR__ . '/stubs/views/edit.stub');
         $updateView = str_replace([' {
                                         {
                                             tableName}
-                                        }
-                                        ', ' {
+                                        }', ' {
                                             {
                                                 formFields}
-                                            }
-                                            ', ' {
+                                            }', ' {
                                                 {
                                                     varName}
-                                                }
-                                                '], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
+                                                }'], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
 
 
         $viewsDirectory = resource_path("views/pages/{$tableName}");
@@ -981,8 +836,7 @@ class CrudCommand extends Command {
         $dateField = str_replace([' {
                                                     {
                                                         $fieldName}
-                                                    }
-                                                    '], [$field['fieldName']], $dateStub);
+                                                    }'], [$field['fieldName']], $dateStub);
 
 
         return $dateField;
@@ -996,8 +850,7 @@ class CrudCommand extends Command {
         $dateField = str_replace([' {
                                                         {
                                                             $fieldName}
-                                                        }
-                                                        '], [$field['fieldName']], $dateStub);
+                                                        }'], [$field['fieldName']], $dateStub);
 
         return $dateField;
 
@@ -1009,8 +862,7 @@ class CrudCommand extends Command {
         $textField = str_replace([' {
                                                             {
                                                                 $fieldName}
-                                                            }
-                                                            '], [$field['fieldName']], $textStub);
+                                                            }'], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -1021,8 +873,7 @@ class CrudCommand extends Command {
         $numberField = str_replace([' {
                                                                 {
                                                                     $fieldName}
-                                                                }
-                                                                '], [$field['fieldName']], $numberStub);
+                                                                }'], [$field['fieldName']], $numberStub);
 
         return $numberField;
     }
@@ -1039,12 +890,10 @@ class CrudCommand extends Command {
         $enumField = str_replace([' {
                                                                     {
                                                                         $fieldName}
-                                                                    }
-                                                                    ', ' {
+                                                                    }', ' {
                                                                         {
                                                                             options}
-                                                                        }
-                                                                        '], [$field['fieldName'], $options], $enumStub);
+                                                                        }'], [$field['fieldName'], $options], $enumStub);
 
         return $enumField;
 
@@ -1059,12 +908,10 @@ class CrudCommand extends Command {
         $selectField = str_replace([' {
                                                                             {
                                                                                 $fieldName}
-                                                                            }
-                                                                            ', ' {
+                                                                            }', ' {
                                                                                 {
                                                                                     selectOptions}
-                                                                                }
-                                                                                '], [$field['fieldName'], $selectOptions], $selectStub);
+                                                                                }'], [$field['fieldName'], $selectOptions], $selectStub);
 
         return $selectField;
 
@@ -1076,8 +923,7 @@ class CrudCommand extends Command {
         $textField = str_replace([' {
                                                                                     {
                                                                                         $fieldName}
-                                                                                    }
-                                                                                    '], [$field['fieldName']], $textStub);
+                                                                                    }'], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -1088,8 +934,7 @@ class CrudCommand extends Command {
         $radioField = str_replace([' {
                                                                                         {
                                                                                             $fieldName}
-                                                                                        }
-                                                                                        '], [$field['fieldName' ] ], $radioStub );
+                                                                                        }'], [$field['fieldName' ] ], $radioStub );
 
                                                                                         return $radioField;
                                                                                     }

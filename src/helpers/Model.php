@@ -5,9 +5,9 @@ use Illuminate\Support\Str;
 
 class Model {
 
-    public function generateModel( $tableName, $fields,$modelName,$relationships ) {
+    public function generateModel( $tableName, $fields, $modelName, $relationships ) {
         // Generate Eloquent model
-        $modelTemplate = File::get( __DIR__ . '/stubs/model.stub' );
+        $modelTemplate = file_get_contents( __DIR__ . '/stubs/model.stub' );
 
         $fillableFields = implode( "', '", array_column( $fields, 'fieldName' ) );
         $relationFunctions = '';
@@ -33,8 +33,7 @@ class Model {
             }
         }
 
-
-        $this->call( 'make:model', [
+        Artisan::call( 'make:model', [
             'name' => $modelName,
         ] );
 

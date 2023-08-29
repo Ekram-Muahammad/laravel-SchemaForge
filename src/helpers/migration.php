@@ -40,14 +40,16 @@ class Migration {
                 $fieldsContent .= '->unique()';
             }
 
-            $fieldsContent .= ';\n';
+            $fieldsContent .= ';'. PHP_EOL;
         }
 
         $tb = Str::ucfirst( $tableName );
 
+        $migrationStubContent= file_get_contents( __DIR__ . '/stubs/migration.stub' );
+
         $migrationContent = str_replace( [ '{{migrateName}}', '{{tableName}}', '{{fields}}' ], [ $tb,
 
-        $tb, $fieldsContent ], file_get_contents( __DIR__ . '/stubs/migration.stub' ) );
+        Str::lower($tableName), $fieldsContent ],$migrationStubContent );
 
         $migrationName = date( 'Y_m_d_His' ) . '_create_' . $tableName . '_table';
 
