@@ -9,89 +9,87 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Ekram\helpers\MigrationController;
+use Ekram\ArtisanCrud\Helpers\Migration;
+use Ekram\ArtisanCrud\Helpers\Model;
 
-
-class CrudCommand extends Command
-{
+class CrudCommand extends Command {
     protected $signature = 'make:crud {jsonFile}';
 
     protected $description = 'Create a Crud Operation';
 
-    public function handle()
-    {
+    public function handle() {
 
         $fields = [];
 
         $relationships = [];
 
-        $jsonFile = $this->argument('jsonFile');
+        $jsonFile = $this->argument( 'jsonFile' );
 
-        $jsonFile = file_get_contents(base_path('/cruds/' . $jsonFile . '.json'));
+        $jsonFile = file_get_contents( base_path( '/cruds/' . $jsonFile . '.json' ) );
 
-        $jsonData = json_decode($jsonFile, true);
+        $jsonData = json_decode( $jsonFile, true );
 
-        $tableName = $jsonData['tableName'];
+        $tableName = $jsonData[ 'tableName' ];
 
-        //        $this->info($jsonData['columns'][0]['name']);
+        $modelName = Str::ucfirst( $tableName );
 
-        $columns = $jsonData['columns'];
+        $columns = $jsonData[ 'columns' ];
 
-        foreach ($columns as $column) {
+        foreach ( $columns as $column ) {
 
             $fieldProperties = [];
-            $fieldName = $column['name'];
-            $fieldType = $column['type'];
-            $defaultValue = $column['defaultValue'];
-            $nullable = $column['nullable'];
-            $unique = $column['unique'];
-            $index = $column['index'];
+            $fieldName = $column[ 'name' ];
+            $fieldType = $column[ 'type' ];
+            $defaultValue = $column[ 'defaultValue' ];
+            $nullable = $column[ 'nullable' ];
+            $unique = $column[ 'unique' ];
+            $index = $column[ 'index' ];
 
-            if (in_array($fieldType, ['string', 'char', 'text'])) {
-                $fieldProperties['length'] = $column['length'];
-            } elseif ($fieldType === 'decimal') {
-                $fieldProperties['precision'] = $column['length'];
-                $fieldProperties['scale'] = $column['precision'];
-            } elseif ($fieldType === 'enum') {
-                $enumValues = $column['values'];
-                $fieldProperties['enumValues'] = explode(',', $enumValues);
+            if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
+                $fieldProperties[ 'length' ] = $column[ 'length' ];
+            } elseif ( $fieldType === 'decimal' ) {
+                $fieldProperties[ 'precision' ] = $column[ 'length' ];
+                $fieldProperties[ 'scale' ] = $column[ 'precision' ];
+            } elseif ( $fieldType === 'enum' ) {
+                $enumValues = $column[ 'values' ];
+                $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
             }
 
             $hasRelation = false;
 
             $isForeignKey = $fieldType == 'foreign' ? true : false;
 
-            if ($isForeignKey) {
+            if ( $isForeignKey ) {
                 $hasRelation = true;
             } else {
                 // to morph
-                $hasRelation = $column['hasRelation'];
+                $hasRelation = $column[ 'hasRelation' ];
             }
 
-            if ($hasRelation) {
+            if ( $hasRelation ) {
                 // generate model relations
-                $relationType = $column['relationType'];
+                $relationType = $column[ 'relationType' ];
 
                 $relatedTable = '';
                 $primaryKey = '';
 
-                if ($relationType == 'morphTo') {
+                if ( $relationType == 'morphTo' ) {
                     $relatedModelName = $fieldName;
-                } elseif ($relationType == 'hasManyThrough') {
-                    $intermediateModel = $column['intermediateModel'];
-                    $targetModel = $column['targetModel'];
+                } elseif ( $relationType == 'hasManyThrough' ) {
+                    $intermediateModel = $column[ 'intermediateModel' ];
+                    $targetModel = $column[ 'targetModel' ];
                     $relatedModelName = $fieldName;
                 } else {
-                    $relatedTable = $column['relatedTable'];
-                    $primaryKey = $column['primaryKey'];
+                    $relatedTable = $column[ 'relatedTable' ];
+                    $primaryKey = $column[ 'primaryKey' ];
                     // Generate related model name
-                    $relatedModelName = Str::studly(Str::ucfirst($relatedTable));
+                    $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
                 }
 
-                $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
 
                 $relationships[] = [
-                    'relationName' => Str::lower(Str::singular($relatedModelName)),
+                    'relationName' => Str::lower( Str::singular( $relatedModelName ) ),
                     'fieldName' => $fieldName,
                     'relationType' => $relationType,
                     'relatedModelName' => $relatedModelName,
@@ -99,268 +97,209 @@ class CrudCommand extends Command
                     'targetModel' => $targetModel ?? null,
                 ];
             } else {
-                $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
             }
 
         }
 
+        // while ( true ) {
+        //     $fieldName = $this->ask( 'Enter field name (or type "done" to finish)' );
 
-
-        // while (true) {
-        //     $fieldName = $this->ask('Enter field name (or type "done" to finish)');
-
-        //     if ($fieldName === 'done') {
+        //     if ( $fieldName === 'done' ) {
         //         break;
         //     }
 
-        //     $fieldType = $this->choice('Select the field type', ['bigIncrements', 'bigInteger', 'foreign', 'string', 'text', 'binary', 'boolean', 'char', 'date', 'dateTime', 'decimal', 'double', 'enum', 'float', 'geometry', 'geometryCollection', 'increments', 'integer', 'ipAddress', 'json', 'jsonb', 'lineString', 'longText', 'macAddress', 'mediumIncrements', 'mediumInteger', 'mediumText', 'morphs', 'multiLineString', 'multiPoint', 'multiPolygon', 'nullableMorphs', 'nullableTimestamps', 'point', 'polygon', 'rememberToken', 'set', 'smallIncrements', 'smallInteger', 'softDeletes', 'time', 'timestamp', 'tinyIncrements', 'tinyInteger', 'timestamps', 'uuid']);
+        //     $fieldType = $this->choice( 'Select the field type', [ 'bigIncrements', 'bigInteger', 'foreign', 'string', 'text', 'binary', 'boolean', 'char', 'date', 'dateTime', 'decimal', 'double', 'enum', 'float', 'geometry', 'geometryCollection', 'increments', 'integer', 'ipAddress', 'json', 'jsonb', 'lineString', 'longText', 'macAddress', 'mediumIncrements', 'mediumInteger', 'mediumText', 'morphs', 'multiLineString', 'multiPoint', 'multiPolygon', 'nullableMorphs', 'nullableTimestamps', 'point', 'polygon', 'rememberToken', 'set', 'smallIncrements', 'smallInteger', 'softDeletes', 'time', 'timestamp', 'tinyIncrements', 'tinyInteger', 'timestamps', 'uuid' ] );
 
         //     $fieldProperties = [];
 
         //     // Set specific properties based on field type
-        //     if (in_array($fieldType, ['string', 'char', 'text'])) {
-        //         $fieldProperties['length'] = $this->ask('Enter the field length', 255);
-        //     } elseif ($fieldType === 'decimal') {
-        //         $fieldProperties['precision'] = $this->ask('Enter the precision', 10);
-        //         $fieldProperties['scale'] = $this->ask('Enter the scale', 2);
-        //     } elseif ($fieldType === 'enum') {
-        //         $enumValues = $this->ask('Enter enum values (comma-separated)');
-        //         $fieldProperties['enumValues'] = explode(',', $enumValues);
+        //     if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
+        //         $fieldProperties[ 'length' ] = $this->ask( 'Enter the field length', 255 );
+        //     } elseif ( $fieldType === 'decimal' ) {
+        //         $fieldProperties[ 'precision' ] = $this->ask( 'Enter the precision', 10 );
+        //         $fieldProperties[ 'scale' ] = $this->ask( 'Enter the scale', 2 );
+        //     } elseif ( $fieldType === 'enum' ) {
+        //         $enumValues = $this->ask( 'Enter enum values (comma-separated)' );
+        //         $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
         //     }
 
-        //     $defaultValue = $this->ask('Enter the default value (leave empty for no default)');
+        //     $defaultValue = $this->ask( 'Enter the default value (leave empty for no default)' );
 
-        //     $nullable = $this->confirm('Is this field nullable?', false);
-        //     $unique = $this->confirm('Should this field be unique?', false);
-        //     $index = $this->choice('Select an index option', ['none', 'index', 'unique'], 'none');
+        //     $nullable = $this->confirm( 'Is this field nullable?', false );
+        //     $unique = $this->confirm( 'Should this field be unique?', false );
+        //     $index = $this->choice( 'Select an index option', [ 'none', 'index', 'unique' ], 'none' );
 
         //     $hasRelation = false;
 
         //     $isForeignKey = $fieldType == 'foreign' ? true : false;
 
-        //     if ($isForeignKey) {
+        //     if ( $isForeignKey ) {
         //         $hasRelation = true;
         //     } else {
         //         // to morph
-        //         $hasRelation = $this->confirm('is this field has a relation');
+        //         $hasRelation = $this->confirm( 'is this field has a relation' );
         //     }
 
-        //     if ($hasRelation) {
+        //     if ( $hasRelation ) {
         //         // generate model relations
-        //         $relationType = $this->choice("Select relation type for field '{$fieldName}'", ['belongsTo', 'hasOne', 'hasMany', 'hasManyThrough', 'belongsToMany', 'morphTo', 'morphMany', 'morphToMany', 'morphedByMany'], 0);
+        //         $relationType = $this->choice( "Select relation type for field '{$fieldName}'", [ 'belongsTo', 'hasOne', 'hasMany', 'hasManyThrough', 'belongsToMany', 'morphTo', 'morphMany', 'morphToMany', 'morphedByMany' ], 0 );
 
         //         $relatedTable = '';
         //         $primaryKey = '';
 
-        //         if ($relationType == 'morphTo') {
+        //         if ( $relationType == 'morphTo' ) {
         //             $relatedModelName = $fieldName;
-        //         } elseif ($relationType == 'hasManyThrough') {
-        //             $intermediateModel = $this->ask('Enter the intermediate model name');
-        //             $targetModel = $this->ask('Enter the target model name');
+        //         } elseif ( $relationType == 'hasManyThrough' ) {
+        //             $intermediateModel = $this->ask( 'Enter the intermediate model name' );
+        //             $targetModel = $this->ask( 'Enter the target model name' );
         //             $relatedModelName = $fieldName;
         //         } else {
-        //             $relatedTable = $this->ask('Enter the related table name');
-        //             $primaryKey = $this->ask('Enter the primary key of the related table', 'id');
+        //             $relatedTable = $this->ask( 'Enter the related table name' );
+        //             $primaryKey = $this->ask( 'Enter the primary key of the related table', 'id' );
         //             // Generate related model name
-        //             $relatedModelName = Str::studly(Str::ucfirst($relatedTable));
+        //             $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
         //         }
 
-        //         $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+        //         $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
 
         //         $relationships[] = [
-        //             'relationName' => Str::lower(Str::singular($relatedModelName)),
+        //             'relationName' => Str::lower( Str::singular( $relatedModelName ) ),
         //             'fieldName' => $fieldName,
         //             'relationType' => $relationType,
         //             'relatedModelName' => $relatedModelName,
         //             'intermediateModel' => $intermediateModel ?? null,
         //             'targetModel' => $targetModel ?? null,
-        //         ];
+        // ];
         //     } else {
-        //         $fields[] = compact('fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index');
+        //         $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
         //     }
         // }
 
-        if (!empty($fields)) {
-            $migrationName = date('Y_m_d_His') . '_create_' . $tableName . '_table';
+        if ( !empty( $fields ) ) {
 
+            $migrationController = new Migration();
 
-            $migrationController=new MigrationController();
+            $migrationController->generateMigrationContent( $tableName, $fields );
 
+            $modelController = new Model();
 
-            $migrationContent = $migrationController->generateMigrationContent($tableName, $fields);
-
-            $this->info(database_path('migrations') . '/' . $migrationName);
-
-            file_put_contents(database_path('migrations') . '/' . $migrationName . '.php', $migrationContent);
-
-            Artisan::call('migrate');
-
-            // Generate Eloquent model
-            $modelTemplate = File::get(__DIR__ . '/stubs/model.stub');
-
-            $fillableFields = implode("', '", array_column($fields, 'fieldName'));
-            $relationFunctions = '';
-
-            foreach ($relationships as $relationship) {
-                if ($relationship['relationType'] === 'morphTo') {
-                    $relationFunction = "\n    public function {$relationship['fieldName']}()\n    {\n";
-                    $relationFunction .= "        return \$this->{$relationship['relationType']}();\n";
-                    $relationFunction .= "    }\n";
-                    $relationFunctions .= $relationFunction;
-                } elseif ($relationship['relationType'] === 'hasManyThrough') {
-                    $intermediateModelName = Str::studly($relationship['intermediateModel']);
-                    $targetModelName = Str::studly($relationship['targetModel']);
-                    $relationFunction = "\n    public function {$relationship['relationName']}()\n    {\n";
-                    $relationFunction .= "        return \$this->{$relationship['relationType']}({$targetModelName}::class, {$intermediateModelName}::class);\n";
-                    $relationFunction .= "    }\n";
-                    $relationFunctions .= $relationFunction;
-                } else {
-                    $relationFunction = "\n    public function {$relationship['relationName']}()\n    {\n";
-                    $relationFunction .= "        return \$this->{$relationship['relationType']}({$relationship['relatedModelName']}::class, '{$relationship['fieldName']}');\n";
-                    $relationFunction .= "    }\n";
-                    $relationFunctions .= $relationFunction;
-                }
-            }
-
-            $modelName = Str::ucfirst($tableName);
-
-            $this->call('make:model', [
-                'name' => $modelName,
-            ]);
-
-            $modelContent = str_replace(['{{modelName}}', '{{tableName}}', '{{fillable}}', '{{relations}}'], [$modelName, Str::lower($tableName), $fillableFields, $relationFunctions], $modelTemplate);
-
-            $modelPath = app_path() . '/Models/' . $modelName . '.php';
-
-            file_put_contents($modelPath, $modelContent);
-
-            $this->info('Model generated successfully.');
+            $modelController->generateModel( $tableName, $fields, $modelName, $relationships );
 
             // create seeder
 
-            $createSeeder = $this->confirm('Do you want to create a seeder for this table?', false);
+            $createSeeder = $this->confirm( 'Do you want to create a seeder for this table?', false );
 
-            if ($createSeeder) {
-                $numRows = $this->ask('Enter the number of rows for the seeder', 10);
+            if ( $createSeeder ) {
+                $numRows = $this->ask( 'Enter the number of rows for the seeder', 10 );
 
                 // Generate the factory for the given table
-                $this->generateFactory($tableName, Str::ucfirst($tableName), $fields);
+                $this->generateFactory( $tableName, Str::ucfirst( $tableName ), $fields );
 
-                $this->addHasFactoryTrait($tableName);
+                $this->addHasFactoryTrait( $tableName );
 
                 // Generate the seeder file
-                $seederClassName = $this->generateSeederFile($tableName);
+                $seederClassName = $this->generateSeederFile( $tableName );
 
                 // Generate the seeder file content
-                $seederContent = $this->generateSeederContent($tableName, $fields, $numRows);
+                $seederContent = $this->generateSeederContent( $tableName, $fields, $numRows );
 
                 // Save the seeder content to a file
-                $seederFileName = Str::studly($tableName) . 'Seeder';
-                $seederFilePath = database_path("seeders/{$seederFileName}.php");
+                $seederFileName = Str::studly( $tableName ) . 'Seeder';
+                $seederFilePath = database_path( "seeders/{$seederFileName}.php" );
 
-                file_put_contents($seederFilePath, $seederContent);
+                file_put_contents( $seederFilePath, $seederContent );
 
-                Artisan::call('db:seed');
+                Artisan::call( 'db:seed' );
             }
 
-            $createController = $this->confirm('Do you want to create a resource controller for this table?');
+            $createController = $this->confirm( 'Do you want to create a resource controller for this table?' );
 
-
-            if ($createController) {
-                $this->generateController($tableName, $fields, $modelName);
+            if ( $createController ) {
+                $this->generateController( $tableName, $fields, $modelName );
             }
 
-            $createApiController = $this->confirm('Do you want to create an api controller for this table?');
+            $createApiController = $this->confirm( 'Do you want to create an api controller for this table?' );
 
-            if ($createApiController) {
-                $this->generateApiController($tableName, $fields, $modelName);
+            if ( $createApiController ) {
+                $this->generateApiController( $tableName, $fields, $modelName );
             }
 
-            $createBladeView = $this->confirm('Do you want to create views  for this table?');
+            $createBladeView = $this->confirm( 'Do you want to create views  for this table?' );
 
-            if ($createBladeView) {
-                $this->generateBladeViews($tableName, $fields);
-                $this->generateFormFields($fields, $tableName);
+            if ( $createBladeView ) {
+                $this->generateBladeViews( $tableName, $fields );
+                $this->generateFormFields( $fields, $tableName );
             }
 
+            Artisan::call( 'optimize:clear' );
 
-
-            Artisan::call('optimize:clear');
-
-
-            $this->info('Custom migration created: ' . $migrationName);
         } else {
-            $this->error('No fields provided. Migration creation aborted.');
+            $this->error( 'No fields provided. Migration creation aborted.' );
         }
     }
 
- 
-
     // create factory
-    protected function generateFactory($tableName, $modelClassName, $fields)
-    {
+    protected function generateFactory( $tableName, $modelClassName, $fields ) {
         // Generate the factory content
-        $factoryContent = $this->generateFactoryContent($tableName, $fields);
+        $factoryContent = $this->generateFactoryContent( $tableName, $fields );
 
-        $modelClassName = Str::studly($tableName);
+        $modelClassName = Str::studly( $tableName );
 
         // Generate the factory file
-        Artisan::call('make:factory', [
+        Artisan::call( 'make:factory', [
             'name' => "{$modelClassName}Factory",
             '--model' => "Models\\{$modelClassName}",
-        ]);
+        ] );
 
-        $factoryFilePath = database_path("factories/{$modelClassName}Factory.php");
-        File::put($factoryFilePath, $factoryContent);
+        $factoryFilePath = database_path( "factories/{$modelClassName}Factory.php" );
+        File::put( $factoryFilePath, $factoryContent );
 
-        $this->info("Factory {$modelClassName}Factory created successfully.");
+        $this->info( "Factory {$modelClassName}Factory created successfully." );
     }
 
-    protected function generateFactoryContent($tableName, $fields)
-    {
-        $factoryStub = File::get(__DIR__ . '/stubs/factory.stub');
-        $modelClassName = Str::studly($tableName);
+    protected function generateFactoryContent( $tableName, $fields ) {
+        $factoryStub = File::get( __DIR__ . '/stubs/factory.stub' );
+        $modelClassName = Str::studly( $tableName );
         $attributes = [];
 
-        foreach ($fields as $field) {
-            $fakerMethod = $this->getFakerMethodForField($field['fieldType']);
+        foreach ( $fields as $field ) {
+            $fakerMethod = $this->getFakerMethodForField( $field[ 'fieldType' ] );
 
-            $foreignFieldTypes = ['foreign', 'foreignId', 'unsignedBigInteger', 'foreignUuid', 'foreignUuidNullable'];
+            $foreignFieldTypes = [ 'foreign', 'foreignId', 'unsignedBigInteger', 'foreignUuid', 'foreignUuidNullable' ];
 
-            if (in_array($field['fieldType'], $foreignFieldTypes)) {
-                $attributes[] = "'{$field['fieldName']}' => \$this->faker->randomElement(\\App\\Models\\" . Str::studly($field['relatedTable']) . "::pluck('id')),";
+            if ( in_array( $field[ 'fieldType' ], $foreignFieldTypes ) ) {
+                $attributes[] = "'{$field['fieldName']}' => \$this->faker->randomElement(\\App\\Models\\" . Str::studly( $field[ 'relatedTable' ] ) . "::pluck('id')),";
             } else {
                 $attributes[] = "'{$field['fieldName']}' => \$this->faker->{$fakerMethod}(),";
             }
         }
 
-        return str_replace(['{{modelClassName}}', '{{attributes}}'], [$modelClassName, implode("\n", $attributes)], $factoryStub);
+        return str_replace( [ '{{modelClassName}}', '{{attributes}}' ], [ $modelClassName, implode( '\n', $attributes ) ], $factoryStub );
     }
 
-    protected function addHasFactoryTrait($tableName)
-    {
-        $modelClassName = Str::studly($tableName);
-        $modelFilePath = app_path("Models/{$modelClassName}.php");
+    protected function addHasFactoryTrait( $tableName ) {
+        $modelClassName = Str::studly( $tableName );
+        $modelFilePath = app_path( "Models/{$modelClassName}.php" );
 
-        if (File::exists($modelFilePath)) {
-            $modelContent = File::get($modelFilePath);
+        if ( File::exists( $modelFilePath ) ) {
+            $modelContent = File::get( $modelFilePath );
 
-            if (!Str::contains($modelContent, 'use Illuminate\Database\Eloquent\Factories\HasFactory;')) {
+            if ( !Str::contains( $modelContent, 'use Illuminate\Database\Eloquent\Factories\HasFactory;' ) ) {
                 // Add HasFactory trait to the model
-                $updatedModelContent = str_replace('use Illuminate\Database\Eloquent\Model;', "use Illuminate\Database\Eloquent\Model;\nuse Illuminate\Database\Eloquent\Factories\HasFactory;", $modelContent);
+                $updatedModelContent = str_replace( 'use Illuminate\Database\Eloquent\Model;', 'use Illuminate\Database\Eloquent\Model;\nuse Illuminate\Database\Eloquent\Factories\HasFactory;', $modelContent );
 
-                $updatedModelContent = preg_replace('/(class [\w\s]+ extends Model\s*\{)/', "$1\n    use HasFactory;", $updatedModelContent);
+                $updatedModelContent = preg_replace( '/(class [\w\s]+ extends Model\s*\{)/', "$1\n    use HasFactory;", $updatedModelContent );
 
-                File::put($modelFilePath, $updatedModelContent);
-                $this->info("HasFactory trait added to {$modelClassName} model.");
+                File::put( $modelFilePath, $updatedModelContent );
+                $this->info( "HasFactory trait added to {$modelClassName} model." );
             } else {
-                $this->info("{$modelClassName} model already uses HasFactory trait.");
+                $this->info( "{$modelClassName} model already uses HasFactory trait." );
             }
         }
     }
 
-    protected function getFakerMethodForField($fieldType)
-    {
+    protected function getFakerMethodForField( $fieldType ) {
         $fakerMethodMap = [
             'string' => 'word',
             'text' => 'text',
@@ -391,34 +330,32 @@ class CrudCommand extends Command
             'day' => 'dayOfMonth',
         ];
 
-        return $fakerMethodMap[$fieldType] ?? 'word';
+        return $fakerMethodMap[ $fieldType ] ?? 'word';
     }
 
-    protected function generateSeederFile($tableName)
-    {
-        $modelClassName = Str::studly($tableName);
+    protected function generateSeederFile( $tableName ) {
+        $modelClassName = Str::studly( $tableName );
         $seederClassName = "{$modelClassName}Seeder";
 
         // Generate the seeder file
-        Artisan::call('make:seeder', [
+        Artisan::call( 'make:seeder', [
             'name' => $seederClassName,
-        ]);
+        ] );
 
         // add seeder to DatabseSeeder file
-        $this->addToDatabaseSeeder($seederClassName);
+        $this->addToDatabaseSeeder( $seederClassName );
 
         return $seederClassName;
     }
 
-    protected function addToDatabaseSeeder($seederClass)
-    {
-        $databaseSeederPath = database_path('seeders/DatabaseSeeder.php');
+    protected function addToDatabaseSeeder( $seederClass ) {
+        $databaseSeederPath = database_path( 'seeders/DatabaseSeeder.php' );
 
-        if (File::exists($databaseSeederPath)) {
-            $databaseSeederContent = File::get($databaseSeederPath);
+        if ( File::exists( $databaseSeederPath ) ) {
+            $databaseSeederContent = File::get( $databaseSeederPath );
 
             // Check if the seeder class is not already present in DatabaseSeeder
-            if (!Str::contains($databaseSeederContent, $seederClass)) {
+            if ( !Str::contains( $databaseSeederContent, $seederClass ) ) {
                 // Add the seeder to the run() method in DatabaseSeeder
                 $modifiedSeederContent = preg_replace(
                     '/(public function run\(\)(?:\s*:\s*void)?\s*\{)/',
@@ -427,477 +364,439 @@ class CrudCommand extends Command
                     1, // Limit to replace only the first occurrence
                 );
 
-                File::put($databaseSeederPath, $modifiedSeederContent);
-                $this->info("Seeder {$seederClass} added to DatabaseSeeder.");
+                File::put( $databaseSeederPath, $modifiedSeederContent );
+                $this->info( "Seeder {$seederClass} added to DatabaseSeeder." );
             } else {
-                $this->info("Seeder {$seederClass} is already present in DatabaseSeeder.");
+                $this->info( "Seeder {$seederClass} is already present in DatabaseSeeder." );
             }
         }
     }
 
-    protected function generateSeederContent($tableName, $fields, $numRows)
-    {
-        $seederStub = File::get(__DIR__ . '/stubs/seeder.stub');
-        $modelClassName = Str::studly($tableName);
+    protected function generateSeederContent( $tableName, $fields, $numRows ) {
+        $seederStub = File::get( __DIR__ . '/stubs/seeder.stub' );
+        $modelClassName = Str::studly( $tableName );
 
-        return str_replace(['{{tableName}}', '{{modelClassName}}', '{{numRows}}'], [Str::studly($tableName), $modelClassName, $numRows], $seederStub);
+        return str_replace( [ '{{tableName}}', '{{modelClassName}}', '{{numRows}}' ], [ Str::studly( $tableName ), $modelClassName, $numRows ], $seederStub );
     }
 
-    protected function generateController($tableName, $fields, $modelName)
-    {
-        $controllerName = ucfirst(Str::camel(Str::singular($tableName))) . 'Controller';
+    protected function generateController( $tableName, $fields, $modelName ) {
+        $controllerName = ucfirst( Str::camel( Str::singular( $tableName ) ) ) . 'Controller';
 
         // Run the make:controller command
-        Artisan::call('make:controller', [
+        Artisan::call( 'make:controller', [
             'name' => $controllerName,
-        ]);
+        ] );
 
-        $controllerContent = $this->generateResourceMethods($fields, $modelName, $controllerName, $tableName);
-
+        $controllerContent = $this->generateResourceMethods( $fields, $modelName, $controllerName, $tableName );
 
         $controllerPath = app_path() . '/Http/Controllers/' . $controllerName . '.php';
 
-        file_put_contents($controllerPath, $controllerContent);
+        file_put_contents( $controllerPath, $controllerContent );
 
-        $this->generateResoutceRoutes($tableName, $controllerName);
+        $this->generateResoutceRoutes( $tableName, $controllerName );
 
-        $this->info("Controller {$controllerName} created successfully.");
+        $this->info( "Controller {$controllerName} created successfully." );
     }
 
-    protected function generateApiController($tableName, $fields, $modelName)
-    {
-        $controllerName = ucfirst(Str::camel(Str::singular($tableName))) . 'Controller';
+    protected function generateApiController( $tableName, $fields, $modelName ) {
+        $controllerName = ucfirst( Str::camel( Str::singular( $tableName ) ) ) . 'Controller';
 
         // Run the make:controller command
-        Artisan::call('make:controller', [
+        Artisan::call( 'make:controller', [
             'name' => 'Api/' . $controllerName,
-        ]);
+        ] );
 
-        $controllerContent = $this->generateApiMethods($fields, $modelName, $controllerName, $tableName);
-
+        $controllerContent = $this->generateApiMethods( $fields, $modelName, $controllerName, $tableName );
 
         $controllerPath = app_path() . '/Http/Controllers/Api/' . $controllerName . '.php';
 
-        file_put_contents($controllerPath, $controllerContent);
+        file_put_contents( $controllerPath, $controllerContent );
 
-        $this->generateApiRoutes($tableName, $controllerName);
+        $this->generateApiRoutes( $tableName, $controllerName );
 
-        $this->info("Controller Api/{$controllerName} created successfully.");
+        $this->info( "Controller Api/{$controllerName} created successfully." );
     }
 
-    protected function generateResourceMethods($fields, $modelName, $controllerName, $tableName)
-    {
+    protected function generateResourceMethods( $fields, $modelName, $controllerName, $tableName ) {
         // Generate logic for each resource function based on the table fields
         $resourceMethods = [
-            'index' => $this->generateIndexMethod($fields, $modelName, $tableName),
-            'show' => $this->generateShowMethod($fields, $modelName, $tableName),
-            'create' => $this->generateCreateMethod($fields, $modelName, $tableName),
-            'store' => $this->generateStoreMethod($fields, $modelName, $tableName),
-            'edit' => $this->generateEditMethod($fields, $modelName, $tableName),
-            'update' => $this->generateUpdateMethod($fields, $modelName, $tableName),
-            'destroy' => $this->generateDestroyMethod($fields, $modelName, $tableName),
+            'index' => $this->generateIndexMethod( $fields, $modelName, $tableName ),
+            'show' => $this->generateShowMethod( $fields, $modelName, $tableName ),
+            'create' => $this->generateCreateMethod( $fields, $modelName, $tableName ),
+            'store' => $this->generateStoreMethod( $fields, $modelName, $tableName ),
+            'edit' => $this->generateEditMethod( $fields, $modelName, $tableName ),
+            'update' => $this->generateUpdateMethod( $fields, $modelName, $tableName ),
+            'destroy' => $this->generateDestroyMethod( $fields, $modelName, $tableName ),
         ];
 
         // Get the controller stub content
-        $stubContent = File::get(__DIR__ . '/stubs/controller.stub');
+        $stubContent = File::get( __DIR__ . '/stubs/controller.stub' );
 
         // Replace placeholders with generated methods
-        foreach ($resourceMethods as $method => $logic) {
-            $stubContent = str_replace("{{{$method}Method}}", $logic, $stubContent);
+        foreach ( $resourceMethods as $method => $logic ) {
+            $stubContent = str_replace( "{{{$method}Method}}", $logic, $stubContent );
         }
 
-        $stubContent = str_replace(["{{ControllerName}}", "{{ModelName}}"], [$controllerName, $modelName], $stubContent);
+        $stubContent = str_replace( [ '{{ControllerName}}', '{{ModelName}}' ], [ $controllerName, $modelName ], $stubContent );
 
         return $stubContent;
     }
 
-    protected function generateApiMethods($fields, $modelName, $controllerName, $tableName)
-    {
+    protected function generateApiMethods( $fields, $modelName, $controllerName, $tableName ) {
         // Generate logic for each resource function based on the table fields
         $apiMethods = [
-            'find' => $this->generateApiFindMethod($fields, $modelName, $tableName),
-            'findAll' => $this->generateApiFindAllMethod($fields, $modelName, $tableName),
-            'store' => $this->generateApiStorMethod($fields, $modelName, $tableName),
-            'update' => $this->generateApiUpdateMethod($fields, $modelName, $tableName),
-            'delete' => $this->generateApiDeleteMethod($fields, $modelName, $tableName),
+            'find' => $this->generateApiFindMethod( $fields, $modelName, $tableName ),
+            'findAll' => $this->generateApiFindAllMethod( $fields, $modelName, $tableName ),
+            'store' => $this->generateApiStorMethod( $fields, $modelName, $tableName ),
+            'update' => $this->generateApiUpdateMethod( $fields, $modelName, $tableName ),
+            'delete' => $this->generateApiDeleteMethod( $fields, $modelName, $tableName ),
         ];
 
         // Get the controller stub content
-        $stubContent = File::get(__DIR__ . '/stubs/apiController.stub');
+        $stubContent = File::get( __DIR__ . '/stubs/apiController.stub' );
 
         // Replace placeholders with generated methods
-        foreach ($apiMethods as $method => $logic) {
-            $stubContent = str_replace("{{{$method}}}", $logic, $stubContent);
+        foreach ( $apiMethods as $method => $logic ) {
+            $stubContent = str_replace( "{{{$method}}}", $logic, $stubContent );
         }
 
-        $stubContent = str_replace(["{{ControllerName}}", "{{ModelName}}"], [$controllerName, $modelName], $stubContent);
+        $stubContent = str_replace( [ '{{ControllerName}}', '{{ModelName}}' ], [ $controllerName, $modelName ], $stubContent );
 
         return $stubContent;
     }
 
-    protected function generateIndexMethod($fields, $modelName, $tableName)
-    {
+    protected function generateIndexMethod( $fields, $modelName, $tableName ) {
 
-        $indexStub = File::get(__DIR__ . '/stubs/methods/resources/index.stub');
+        $indexStub = File::get( __DIR__ . '/stubs/methods/resources/index.stub' );
 
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $indexStub);
-
-    }
-
-    protected function generateApiFindMethod($fields, $modelName, $tableName)
-    {
-
-        $findStub = File::get(__DIR__ . '/stubs/methods/api/find.stub');
-
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $findStub);
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $indexStub );
 
     }
 
-    protected function generateApiFindAllMethod($fields, $modelName, $tableName)
-    {
+    protected function generateApiFindMethod( $fields, $modelName, $tableName ) {
 
-        $findAllStub = File::get(__DIR__ . '/stubs/methods/api/findAll.stub');
+        $findStub = File::get( __DIR__ . '/stubs/methods/api/find.stub' );
 
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $findAllStub);
-
-    }
-
-    protected function generateShowMethod($fields, $modelName, $tableName)
-    {
-
-        $showStub = File::get(__DIR__ . '/stubs/methods/resources/show.stub');
-
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $showStub);
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $findStub );
 
     }
 
-    protected function generateCreateMethod($fields, $modelName, $tableName)
-    {
+    protected function generateApiFindAllMethod( $fields, $modelName, $tableName ) {
 
-        $createStub = File::get(__DIR__ . '/stubs/methods/resources/create.stub');
+        $findAllStub = File::get( __DIR__ . '/stubs/methods/api/findAll.stub' );
 
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $createStub);
-
-    }
-
-    protected function generateEditMethod($fields, $modelName, $tableName)
-    {
-
-        $editStub = File::get(__DIR__ . '/stubs/methods/resources/edit.stub');
-
-        return str_replace(['{{ModelName}}', '{{tableName}}'], [$modelName, $tableName,], $editStub);
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $findAllStub );
 
     }
 
+    protected function generateShowMethod( $fields, $modelName, $tableName ) {
 
-    protected function generateStoreMethod($fields, $modelName, $tableName)
-    {
+        $showStub = File::get( __DIR__ . '/stubs/methods/resources/show.stub' );
+
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $showStub );
+
+    }
+
+    protected function generateCreateMethod( $fields, $modelName, $tableName ) {
+
+        $createStub = File::get( __DIR__ . '/stubs/methods/resources/create.stub' );
+
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $createStub );
+
+    }
+
+    protected function generateEditMethod( $fields, $modelName, $tableName ) {
+
+        $editStub = File::get( __DIR__ . '/stubs/methods/resources/edit.stub' );
+
+        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $editStub );
+
+    }
+
+    protected function generateStoreMethod( $fields, $modelName, $tableName ) {
 
         $storeLogic = '';
 
         $validationRules = [];
 
-        foreach ($fields as $field) {
-            $fieldType = $field['fieldType'];
-            $isNullabe = $field['nullable'];
-            $fieldName = $field['fieldName'];
-            $rules = $this->generateValidationRulesForFieldType($fieldType, $isNullabe);
-            $validationRules[$fieldName] = $rules;
+        foreach ( $fields as $field ) {
+            $fieldType = $field[ 'fieldType' ];
+            $isNullabe = $field[ 'nullable' ];
+            $fieldName = $field[ 'fieldName' ];
+            $rules = $this->generateValidationRulesForFieldType( $fieldType, $isNullabe );
+            $validationRules[ $fieldName ] = $rules;
         }
 
         // Generate validation logic
         $validationLogic = '';
-        foreach ($validationRules as $field => $rules) {
-            $rulesString = implode('|', $rules);
+        foreach ( $validationRules as $field => $rules ) {
+            $rulesString = implode( '|', $rules );
             $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
         }
 
-        foreach ($fields as $field) {
-            $fieldName = $field['fieldName'];
+        foreach ( $fields as $field ) {
+            $fieldName = $field[ 'fieldName' ];
             $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
         }
 
-        $storeStub = File::get(__DIR__ . '/stubs/methods/resources/store.stub');
+        $storeStub = File::get( __DIR__ . '/stubs/methods/resources/store.stub' );
 
-        return str_replace(['{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}'], [$modelName, $storeLogic, $tableName, $validationLogic], $storeStub);
+        return str_replace( [ '{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
 
     }
 
-    protected function generateApiStorMethod($fields, $modelName, $tableName)
-    {
+    protected function generateApiStorMethod( $fields, $modelName, $tableName ) {
 
         $storeLogic = '';
 
         $validationRules = [];
 
-        foreach ($fields as $field) {
-            $fieldType = $field['fieldType'];
-            $isNullabe = $field['nullable'];
-            $fieldName = $field['fieldName'];
-            $rules = $this->generateValidationRulesForFieldType($fieldType, $isNullabe);
-            $validationRules[$fieldName] = $rules;
+        foreach ( $fields as $field ) {
+            $fieldType = $field[ 'fieldType' ];
+            $isNullabe = $field[ 'nullable' ];
+            $fieldName = $field[ 'fieldName' ];
+            $rules = $this->generateValidationRulesForFieldType( $fieldType, $isNullabe );
+            $validationRules[ $fieldName ] = $rules;
         }
 
         // Generate validation logic
         $validationLogic = '';
-        foreach ($validationRules as $field => $rules) {
-            $rulesString = implode('|', $rules);
+        foreach ( $validationRules as $field => $rules ) {
+            $rulesString = implode( '|', $rules );
             $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
         }
 
-        foreach ($fields as $field) {
-            $fieldName = $field['fieldName'];
+        foreach ( $fields as $field ) {
+            $fieldName = $field[ 'fieldName' ];
             $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
         }
 
-        $storeStub = File::get(__DIR__ . '/stubs/methods/api/store.stub');
+        $storeStub = File::get( __DIR__ . '/stubs/methods/api/store.stub' );
 
-        return str_replace(['{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}'], [$modelName, $storeLogic, $tableName, $validationLogic], $storeStub);
+        return str_replace( [ '{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
 
     }
 
-    protected function generateUpdateMethod($fields, $modelName, $tableName)
-    {
+    protected function generateUpdateMethod( $fields, $modelName, $tableName ) {
 
         $updateLogic = '';
 
         $validationRules = [];
 
-        foreach ($fields as $field) {
-            $fieldType = $field['fieldType'];
-            $isNullabe = $field['nullable'];
-            $fieldName = $field['fieldName'];
-            $rules = $this->generateValidationRulesForFieldType($fieldType, $isNullabe);
-            $validationRules[$fieldName] = $rules;
+        foreach ( $fields as $field ) {
+            $fieldType = $field[ 'fieldType' ];
+            $isNullabe = $field[ 'nullable' ];
+            $fieldName = $field[ 'fieldName' ];
+            $rules = $this->generateValidationRulesForFieldType( $fieldType, $isNullabe );
+            $validationRules[ $fieldName ] = $rules;
         }
 
         // Generate validation logic
         $validationLogic = '';
-        foreach ($validationRules as $field => $rules) {
-            $rulesString = implode('|', $rules);
+        foreach ( $validationRules as $field => $rules ) {
+            $rulesString = implode( '|', $rules );
             $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
         }
 
-        foreach ($fields as $field) {
-            $fieldName = $field['fieldName'];
+        foreach ( $fields as $field ) {
+            $fieldName = $field[ 'fieldName' ];
             $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
         }
 
-        $updateStub = File::get(__DIR__ . '/stubs/methods/resources/update.stub');
+        $updateStub = File::get( __DIR__ . '/stubs/methods/resources/update.stub' );
 
-        return str_replace(['{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}'], [$modelName, $updateLogic, $tableName, Str::singular($tableName), $validationLogic], $updateStub);
+        return str_replace( [ '{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
 
     }
 
-
-    protected function generateApiUpdateMethod($fields, $modelName, $tableName)
-    {
+    protected function generateApiUpdateMethod( $fields, $modelName, $tableName ) {
 
         $updateLogic = '';
 
         $validationRules = [];
 
-        foreach ($fields as $field) {
-            $fieldType = $field['fieldType'];
-            $isNullabe = $field['nullable'];
-            $fieldName = $field['fieldName'];
-            $rules = $this->generateValidationRulesForFieldType($fieldType, $isNullabe);
-            $validationRules[$fieldName] = $rules;
+        foreach ( $fields as $field ) {
+            $fieldType = $field[ 'fieldType' ];
+            $isNullabe = $field[ 'nullable' ];
+            $fieldName = $field[ 'fieldName' ];
+            $rules = $this->generateValidationRulesForFieldType( $fieldType, $isNullabe );
+            $validationRules[ $fieldName ] = $rules;
         }
 
         // Generate validation logic
         $validationLogic = '';
-        foreach ($validationRules as $field => $rules) {
-            $rulesString = implode('|', $rules);
+        foreach ( $validationRules as $field => $rules ) {
+            $rulesString = implode( '|', $rules );
             $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
         }
 
-        foreach ($fields as $field) {
-            $fieldName = $field['fieldName'];
+        foreach ( $fields as $field ) {
+            $fieldName = $field[ 'fieldName' ];
             $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
         }
 
-        $updateStub = File::get(__DIR__ . '/stubs/methods/api/update.stub');
+        $updateStub = File::get( __DIR__ . '/stubs/methods/api/update.stub' );
 
-        return str_replace(['{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}'], [$modelName, $updateLogic, $tableName, Str::singular($tableName), $validationLogic], $updateStub);
-
-    }
-
-    protected function generateDestroyMethod($fields, $modelName, $tableName)
-    {
-
-        $destroyStub = File::get(__DIR__ . '/stubs/methods/resources/destroy.stub');
-
-        return str_replace(['{{ModelName}}', '{{tableName}}', '{{varName}}'], [$modelName, $tableName, Str::singular($tableName)], $destroyStub);
+        return str_replace( [ '{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
 
     }
 
-    protected function generateApiDeleteMethod($fields, $modelName, $tableName)
-    {
+    protected function generateDestroyMethod( $fields, $modelName, $tableName ) {
 
-        $deleteStub = File::get(__DIR__ . '/stubs/methods/api/delete.stub');
+        $destroyStub = File::get( __DIR__ . '/stubs/methods/resources/destroy.stub' );
 
-        return str_replace(['{{ModelName}}', '{{tableName}}', '{{varName}}'], [$modelName, $tableName, Str::singular($tableName)], $deleteStub);
+        return str_replace( [ '{{ModelName}}', '{{tableName}}', '{{varName}}' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $destroyStub );
 
     }
 
+    protected function generateApiDeleteMethod( $fields, $modelName, $tableName ) {
 
+        $deleteStub = File::get( __DIR__ . '/stubs/methods/api/delete.stub' );
 
-    protected function generateValidationRulesForFieldType($fieldType, $nullable)
-    {
+        return str_replace( [ '{{ModelName}}', '{{tableName}}', '{{varName}}' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $deleteStub );
+
+    }
+
+    protected function generateValidationRulesForFieldType( $fieldType, $nullable ) {
         $rules = [];
 
-        if (!$nullable) {
+        if ( !$nullable ) {
             $rules[] = 'required';
         }
 
-        switch ($fieldType) {
+        switch ( $fieldType ) {
             case 'string':
-                $rules[] = 'string|max:255';
-                break;
+            $rules[] = 'string|max:255';
+            break;
             case 'integer':
-                $rules[] = 'integer';
-                break;
+            $rules[] = 'integer';
+            break;
             case 'boolean':
-                $rules[] = 'boolean';
-                break;
+            $rules[] = 'boolean';
+            break;
             case 'date':
-                $rules[] = 'date';
-                break;
+            $rules[] = 'date';
+            break;
             case 'time':
-                $rules[] = 'time';
-                break;
+            $rules[] = 'time';
+            break;
             case 'datetime':
-                $rules[] = 'date_time';
-                break;
+            $rules[] = 'date_time';
+            break;
             case 'email':
-                $rules[] = 'email';
-                break;
+            $rules[] = 'email';
+            break;
             case 'numeric':
-                $rules[] = 'numeric';
-                break;
+            $rules[] = 'numeric';
+            break;
             case 'url':
-                $rules[] = 'url';
-                break;
+            $rules[] = 'url';
+            break;
             case 'file':
-                $rules[] = 'file';
-                break;
+            $rules[] = 'file';
+            break;
             case 'image':
-                $rules[] = 'image';
-                break;
+            $rules[] = 'image';
+            break;
             // Add more cases for other field types
 
             default:
-                // Handle unsupported field types
-                break;
+            // Handle unsupported field types
+            break;
         }
 
         return $rules;
     }
 
+    protected function generateApiRoutes( $tableName, $controllerName ) {
+        $routesFilePath = base_path( 'routes/api.php' );
 
-    protected function generateApiRoutes($tableName, $controllerName)
-    {
-        $routesFilePath = base_path('routes/api.php');
-
-        $apiContent = File::get(base_path('routes/api.php'));
-
+        $apiContent = File::get( base_path( 'routes/api.php' ) );
 
         $importStatement = "<?php \n use App\Http\Controllers\Api\\$controllerName; \n";
 
-        $routeApiContent = str_replace(['<?php'], [$importStatement], $apiContent);
+        $routeApiContent = str_replace( [ '<?php' ], [ $importStatement ], $apiContent );
 
-        File::put($routesFilePath, $routeApiContent);
+        File::put( $routesFilePath, $routeApiContent );
 
+        $apiRouteStub = File::get( __DIR__ . '/stubs/routes/api.stub' );
 
-        $apiRouteStub = File::get(__DIR__ . '/stubs/routes/api.stub');
-
-        $routeContent = str_replace(['{{controllerName}}', '{{tableName}}'], [$controllerName, $tableName], $apiRouteStub);
+        $routeContent = str_replace( [ '{{controllerName}}', '{{tableName}}' ], [ $controllerName, $tableName ], $apiRouteStub );
 
         // Append the generated route content to api.php
-        File::append($routesFilePath, $routeContent);
-
-
+        File::append( $routesFilePath, $routeContent );
 
     }
 
-    protected function generateResoutceRoutes($tableName, $controllerName)
-    {
-        $routesFilePath = base_path('routes/web.php');
+    protected function generateResoutceRoutes( $tableName, $controllerName ) {
+        $routesFilePath = base_path( 'routes/web.php' );
 
-
-        $routeontent = File::get(base_path('routes/web.php'));
+        $routeontent = File::get( base_path( 'routes/web.php' ) );
 
         $importStatement = "<?php \n use App\Http\Controllers\\$controllerName; \n";
-        $routeApiContent = str_replace(['<?php'], [$importStatement], $routeontent);
-        File::put($routesFilePath, $routeApiContent);
+        $routeApiContent = str_replace( [ '<?php' ], [ $importStatement ], $routeontent );
+        File::put( $routesFilePath, $routeApiContent );
 
-
-        $resourceRouteStub = File::get(__DIR__ . '/stubs/routes/web.stub');
-        $routeContent = str_replace(['{{controllerName}}', '{{tableName}}'], [$controllerName, $tableName], $resourceRouteStub);
-        File::append($routesFilePath, $routeContent);
+        $resourceRouteStub = File::get( __DIR__ . '/stubs/routes/web.stub' );
+        $routeContent = str_replace( [ '{{controllerName}}', '{{tableName}}' ], [ $controllerName, $tableName ], $resourceRouteStub );
+        File::append( $routesFilePath, $routeContent );
     }
 
+    protected function generateBladeViews( $tableName, $fields ) {
 
-    protected function generateBladeViews($tableName, $fields)
-    {
+        $layoutPath = resource_path( 'views/layouts' );
 
-        $layoutPath = resource_path("views/layouts");
-
-        if (!File::exists($layoutPath)) {
-            File::makeDirectory($layoutPath);
+        if ( !File::exists( $layoutPath ) ) {
+            File::makeDirectory( $layoutPath );
         }
 
-        $dashboardPath = resource_path("views/layouts/dashboard.blade.php");
+        $dashboardPath = resource_path( 'views/layouts/dashboard.blade.php' );
 
-        if (!File::exists($dashboardPath)) {
-            $dashboardStub = File::get(__DIR__ . '/stubs/layouts/dashboard.stub');
+        if ( !File::exists( $dashboardPath ) ) {
+            $dashboardStub = File::get( __DIR__ . '/stubs/layouts/dashboard.stub' );
 
-            $menu = File::get(__DIR__ . '/stubs/component/menu.stub');
-            $menuContent = str_replace(['{{tableName}}'], [$tableName], $menu);
+            $menu = File::get( __DIR__ . '/stubs/component/menu.stub' );
+            $menuContent = str_replace( [ '{{tableName}}' ], [ $tableName ], $menu );
 
-            $menuContent = str_replace(['{{sidebarItems}}'], [$menuContent], $dashboardStub);
+            $menuContent = str_replace( [ '{{sidebarItems}}' ], [ $menuContent ], $dashboardStub );
 
-            File::put($dashboardPath, $menuContent);
+            File::put( $dashboardPath, $menuContent );
         } else {
 
-            $dashboardContent = File::get(resource_path("views/layouts/dashboard.blade.php"));
+            $dashboardContent = File::get( resource_path( 'views/layouts/dashboard.blade.php' ) );
 
             // Step 2: Modify the HTML Content
-            $menu = File::get(__DIR__ . '/stubs/component/menu.stub');
+            $menu = File::get( __DIR__ . '/stubs/component/menu.stub' );
 
-
-            $menuContent = str_replace(['{{tableName}}'], [$tableName], $menu);
-
+            $menuContent = str_replace( [ '{{tableName}}' ], [ $tableName ], $menu );
 
             $dom = new \DOMDocument();
 
-            $dom->loadHTML($dashboardContent, LIBXML_NOERROR);
+            $dom->loadHTML( $dashboardContent, LIBXML_NOERROR );
 
-            $divId = 'nav-menu'; // Replace with your actual div ID
-            $specificDiv = $dom->getElementById($divId);
+            $divId = 'nav-menu';
+            // Replace with your actual div ID
+            $specificDiv = $dom->getElementById( $divId );
 
-            if ($specificDiv) {
+            if ( $specificDiv ) {
                 $fragment = $dom->createDocumentFragment();
-                $fragment->appendXML($menuContent);
-                $specificDiv->appendChild($fragment);
+                $fragment->appendXML( $menuContent );
+                $specificDiv->appendChild( $fragment );
             }
 
             $modifiedHtmlContent = $dom->saveHTML();
 
-            $modifiedHtmlContent = str_replace(["%7B%7B", "%7D%7D", "%20"], ["{{", "}}", ""], $modifiedHtmlContent);
+            $modifiedHtmlContent = str_replace( [ '%7B%7B', '%7D%7D', '%20' ], [ '{{', '}}', '' ], $modifiedHtmlContent );
 
             // Step 3: Write Modified Content
-            File::put($dashboardPath, $modifiedHtmlContent);
+            File::put( $dashboardPath, $modifiedHtmlContent );
         }
 
+        $folderPath = resource_path( 'views/pages' );
 
-        $folderPath = resource_path("views/pages");
-
-        if (!File::exists($folderPath)) {
-            File::makeDirectory($folderPath);
+        if ( !File::exists( $folderPath ) ) {
+            File::makeDirectory( $folderPath );
         }
-
 
         // Create the directory for the views if it doesn't exist
         $viewsDirectory = resource_path("views/pages/{$tableName}");
@@ -912,7 +811,19 @@ class CrudCommand extends Command
         $headers = $this->generateTableHeaders($fields);
         $records = $this->generateTableColumns($fields);
 
-        $indexContent = str_replace(['{{tableName}}', '{{headers}}', '{{records}}'], [$tableName, $headers, $records], $indexViewStub);
+        $indexContent = str_replace([' {
+        {
+            tableName}
+        }
+        ', ' {
+            {
+                headers}
+            }
+            ', ' {
+                {
+                    records}
+                }
+                '], [$tableName, $headers, $records], $indexViewStub);
 
         File::put("{$viewsDirectory}/index.blade.php", $indexContent);
 
@@ -940,7 +851,19 @@ class CrudCommand extends Command
 
         $data = $this->generateFieldShow($fields);
 
-        $showContent = str_replace(['{{tableName}}', '{{headers}}', '{{fields}}'], [$tableName, $headers, $data], $showViewStub);
+        $showContent = str_replace([' {
+                    {
+                        tableName}
+                    }
+                    ', ' {
+                        {
+                            headers}
+                        }
+                        ', ' {
+                            {
+                                fields}
+                            }
+                            '], [$tableName, $headers, $data], $showViewStub);
 
         File::put("{$viewsDirectory}/show.blade.php", $showContent);
 
@@ -986,11 +909,31 @@ class CrudCommand extends Command
         }
 
         $createStub = File::get(__DIR__ . '/stubs/views/create.stub');
-        $createView = str_replace(['{{tableName}}', '{{formFields}}'], [$tableName, $formFields], $createStub);
+        $createView = str_replace([' {
+                                {
+                                    tableName}
+                                }
+                                ', ' {
+                                    {
+                                        formFields}
+                                    }
+                                    '], [$tableName, $formFields], $createStub);
 
 
         $updateStub = File::get(__DIR__ . '/stubs/views/edit.stub');
-        $updateView = str_replace(['{{tableName}}', '{{formFields}}', '{{varName}}'], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
+        $updateView = str_replace([' {
+                                        {
+                                            tableName}
+                                        }
+                                        ', ' {
+                                            {
+                                                formFields}
+                                            }
+                                            ', ' {
+                                                {
+                                                    varName}
+                                                }
+                                                '], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
 
 
         $viewsDirectory = resource_path("views/pages/{$tableName}");
@@ -1035,7 +978,11 @@ class CrudCommand extends Command
     {
 
         $dateStub = File::get(__DIR__ . '/stubs/form/date.stub');
-        $dateField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $dateStub);
+        $dateField = str_replace([' {
+                                                    {
+                                                        $fieldName}
+                                                    }
+                                                    '], [$field['fieldName']], $dateStub);
 
 
         return $dateField;
@@ -1046,7 +993,11 @@ class CrudCommand extends Command
     {
 
         $dateStub = File::get(__DIR__ . '/stubs/form/dateTime.stub');
-        $dateField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $dateStub);
+        $dateField = str_replace([' {
+                                                        {
+                                                            $fieldName}
+                                                        }
+                                                        '], [$field['fieldName']], $dateStub);
 
         return $dateField;
 
@@ -1055,7 +1006,11 @@ class CrudCommand extends Command
     protected function generateTextareaField($field)
     {
         $textStub = File::get(__DIR__ . '/stubs/form/textArea.stub');
-        $textField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $textStub);
+        $textField = str_replace([' {
+                                                            {
+                                                                $fieldName}
+                                                            }
+                                                            '], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -1063,7 +1018,11 @@ class CrudCommand extends Command
     protected function generateNumberField($field)
     {
         $numberStub = File::get(__DIR__ . '/stubs/form/number.stub');
-        $numberField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $numberStub);
+        $numberField = str_replace([' {
+                                                                {
+                                                                    $fieldName}
+                                                                }
+                                                                '], [$field['fieldName']], $numberStub);
 
         return $numberField;
     }
@@ -1077,7 +1036,15 @@ class CrudCommand extends Command
             $options .= "<option value=\"$value\">{{ \$value }}</option>";
         }
         $enumStub = File::get(__DIR__ . '/stubs/form/enum.stub');
-        $enumField = str_replace(['{{$fieldName}}', '{{options}}'], [$field['fieldName'], $options], $enumStub);
+        $enumField = str_replace([' {
+                                                                    {
+                                                                        $fieldName}
+                                                                    }
+                                                                    ', ' {
+                                                                        {
+                                                                            options}
+                                                                        }
+                                                                        '], [$field['fieldName'], $options], $enumStub);
 
         return $enumField;
 
@@ -1089,7 +1056,15 @@ class CrudCommand extends Command
         $selectOptions = "$relatedModel::pluck('id')";
 
         $selectStub = File::get(__DIR__ . '/stubs/form/select.stub');
-        $selectField = str_replace(['{{$fieldName}}', '{{selectOptions}}'], [$field['fieldName'], $selectOptions], $selectStub);
+        $selectField = str_replace([' {
+                                                                            {
+                                                                                $fieldName}
+                                                                            }
+                                                                            ', ' {
+                                                                                {
+                                                                                    selectOptions}
+                                                                                }
+                                                                                '], [$field['fieldName'], $selectOptions], $selectStub);
 
         return $selectField;
 
@@ -1098,7 +1073,11 @@ class CrudCommand extends Command
     protected function generateTextField($field)
     {
         $textStub = File::get(__DIR__ . '/stubs/form/text.stub');
-        $textField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $textStub);
+        $textField = str_replace([' {
+                                                                                    {
+                                                                                        $fieldName}
+                                                                                    }
+                                                                                    '], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -1106,8 +1085,12 @@ class CrudCommand extends Command
     protected function generateBooleanField($field)
     {
         $radioStub = File::get(__DIR__ . '/stubs/form/radio.stub');
-        $radioField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $radioStub);
+        $radioField = str_replace([' {
+                                                                                        {
+                                                                                            $fieldName}
+                                                                                        }
+                                                                                        '], [$field['fieldName' ] ], $radioStub );
 
-        return $radioField;
-    }
-}
+                                                                                        return $radioField;
+                                                                                    }
+                                                                                }

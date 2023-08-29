@@ -1,9 +1,11 @@
 <?php
-namespace src\helpers;
+namespace Ekram\ArtisanCrud\Helpers;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 
-class MigrationController {
+class Migration {
 
-    protected function generateMigrationContent( $tableName, $fields ) {
+    public function generateMigrationContent( $tableName, $fields ) {
         $fieldsContent = '';
 
         foreach ( $fields as $field ) {
@@ -41,7 +43,17 @@ class MigrationController {
             $fieldsContent .= ';\n';
         }
 
-        return str_replace( [ '{{migrateName}}', '{{tableName}}', '{{fields}}' ], [ Str::ucfirst( $tableName ),
-        Str::lower( $tableName ), $fieldsContent ], file_get_contents( __DIR__ . '/stubs/migration.stub' ) );
+        $tb = Str::ucfirst( $tableName );
+
+        $migrationContent = str_replace( [ '{{migrateName}}', '{{tableName}}', '{{fields}}' ], [ $tb,
+
+        $tb, $fieldsContent ], file_get_contents( __DIR__ . '/stubs/migration.stub' ) );
+
+        $migrationName = date( 'Y_m_d_His' ) . '_create_' . $tableName . '_table';
+
+        file_put_contents( database_path( 'migrations' ) . '/' . $migrationName . '.php', $migrationContent );
+
+        Artisan::call( 'migrate' );
+
     }
 }

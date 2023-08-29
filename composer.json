@@ -4,13 +4,12 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ekram\\ArtisanCrud\\": "src/",
-            "Ekram\\helpers\\": "src/helpers"
+            "Ekram\\ArtisanCrud\\": "src/"
         }
     },
     "authors": [
         {
-            "name": "EkramAminTornet",
+            "name": "Ekram Amin",
             "email": "114848248+EkramAminTornet@users.noreply.github.com"
         }
     ],
