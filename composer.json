@@ -4,7 +4,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ekram\\ArtisanCrud\\": "src/"
+            "Ekram\\ArtisanCrud\\": "src/",
+            "Ekram\\helpers\\": "src/helpers"
         }
     },
     "authors": [
