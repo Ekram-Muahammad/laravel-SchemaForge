@@ -5,7 +5,7 @@ use Illuminate\Support\Str;
 
 class Seeder {
     public function generateSeederFile( $tableName ) {
-        $modelClassName = Str::studly( $tableName );
+        $modelClassName = Str::ucfirst( $tableName );
         $seederClassName = "{$modelClassName}Seeder";
 
         // Generate the seeder file

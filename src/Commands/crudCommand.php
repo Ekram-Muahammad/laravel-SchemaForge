@@ -12,9 +12,12 @@ use Illuminate\Support\Str;
 use Ekram\ArtisanCrud\Helpers\Migration;
 use Ekram\ArtisanCrud\Helpers\Model;
 use Ekram\ArtisanCrud\Helpers\Field;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Ekram\ArtisanCrud\Helpers\Reset;
 
 class CrudCommand extends Command {
-    protected $signature = 'make:crud {jsonFile}';
+    protected $signature = 'make:crud {jsonFile} {action?}';
 
     protected $description = 'Create a Crud Operation';
 
@@ -26,83 +29,112 @@ class CrudCommand extends Command {
 
         $jsonFile = $this->argument( 'jsonFile' );
 
-        $jsonFile = file_get_contents( base_path( '/cruds/' . $jsonFile . '.json' ) );
+        if ( file_exists( base_path( '/cruds/' . $jsonFile . '.json' ) ) ) {
 
-        $jsonData = json_decode( $jsonFile, true );
-
-        $tableName = $jsonData[ 'tableName' ];
-
-        $modelName = Str::ucfirst( $tableName );
-
-        $columns = $jsonData[ 'columns' ];
-
-        $field = new Field();
-        $data = $field->generateFields( $columns );
-
-        $fields = $data[ 'fields' ];
-        $relationships = $data[ 'relationships' ];
-
-        if ( !empty( $fields ) ) {
-
-            $migrationController = new Migration();
-
-            $migrationController->generateMigrationContent( $tableName, $fields );
-
-            $modelController = new Model();
-
-            $modelController->generateModel( $tableName, $fields, $modelName, $relationships );
-
-            // create seeder
-
-            $createSeeder = $jsonData[ 'createSeeder' ] ?? false;
-
-            if ( $createSeeder ) {
-                $numRows = $jsonData[ 'seederNumRows' ] ?? 10;
-
-                // Generate the factory for the given table
-
-                $factory = new Factory();
-
-                $factory->generateFactory( $tableName, Str::ucfirst( $tableName ), $fields );
-
-                $factory->addHasFactoryTrait( $tableName );
-
-                // Generate the seeder file
-
-                $seeder = new Seeder();
-                $seeder->generateSeederFile( $tableName );
-                // Generate the seeder file content
-                $seeder->generateSeederContent( $tableName, $fields, $numRows );
+            try {
+                //code...
+                $conntection = DB::connection()->getPdo();
+            } catch ( \Throwable $th ) {
+                $this->error( 'The Database connection is  unavailable' );
+                return;
             }
 
-            $createController = $jsonData[ 'resourceController' ] ?? false;
+            $jsonFile = file_get_contents( base_path( '/cruds/' . $jsonFile . '.json' ) );
 
-            if ( $createController ) {
-                $resourceController = new ResoureController();
-                $resourceController->generateController( $tableName, $fields, $modelName );
+            $jsonData = json_decode( $jsonFile, true );
+
+            $tableName = $jsonData[ 'tableName' ];
+
+            $action = $this->argument( 'action' ) ?? 'none';
+
+            if ( $action == 'reset' ) {
+                new Reset( $tableName );
+
+                return;
+            } else if ( $action == 'update' ) {
+                new Reset( $tableName );
             }
 
-            $createApiController = $jsonData[ 'apiController' ] ?? false;
+            if ( !Schema::hasTable( $tableName ) ) {
 
-            if ( $createApiController ) {
-                $apiController = new ApiController();
-                $apiController->generateApiController( $tableName, $fields, $modelName );
+                $modelName = Str::ucfirst( $tableName );
+
+                $columns = $jsonData[ 'columns' ];
+
+                $field = new Field();
+                $data = $field->generateFields( $columns );
+
+                $fields = $data[ 'fields' ];
+                $relationships = $data[ 'relationships' ];
+
+                if ( !empty( $fields ) ) {
+
+                    $migrationController = new Migration();
+
+                    $migrationController->generateMigrationContent( $tableName, $fields );
+
+                    $modelController = new Model();
+
+                    $modelController->generateModel( $tableName, $fields, $modelName, $relationships );
+
+                    // create seeder
+
+                    $createSeeder = $jsonData[ 'createSeeder' ] ?? false;
+
+                    if ( $createSeeder ) {
+                        $numRows = $jsonData[ 'seederNumRows' ] ?? 10;
+
+                        // Generate the factory for the given table
+
+                        $factory = new Factory();
+
+                        $factory->generateFactory( $tableName, Str::ucfirst( $tableName ), $fields );
+
+                        $factory->addHasFactoryTrait( $tableName );
+
+                        // Generate the seeder file
+
+                        $seeder = new Seeder();
+                        $seeder->generateSeederFile( $tableName );
+                        // Generate the seeder file content
+                        $seeder->generateSeederContent( $tableName, $fields, $numRows );
+                    }
+
+                    $createController = $jsonData[ 'resourceController' ] ?? false;
+
+                    if ( $createController ) {
+                        $resourceController = new ResoureController();
+                        $resourceController->generateController( $tableName, $fields, $modelName );
+                    }
+
+                    $createApiController = $jsonData[ 'apiController' ] ?? false;
+
+                    if ( $createApiController ) {
+                        $apiController = new ApiController();
+                        $apiController->generateApiController( $tableName, $fields, $modelName );
+                    }
+
+                    $createBladeView = $jsonData[ 'views' ] ?? false;
+
+                    if ( $createBladeView ) {
+                        $views = new Views();
+                        $views->generateBladeViews( $tableName, $fields );
+                        $views->generateFormFields( $fields, $tableName );
+                    }
+
+                    Artisan::call( 'optimize:clear' );
+
+                    $this->info( 'all requirements created successfully' );
+
+                } else {
+                    $this->error( 'Not Fields provided' );
+                }
+            } else {
+                $this->error( "The table $tableName exists in the database." );
             }
-
-            $createBladeView = $jsonData[ 'views' ] ?? false;
-
-            if ( $createBladeView ) {
-                $views=new Views();
-                $views->generateBladeViews( $tableName, $fields );
-                $views->generateFormFields( $fields, $tableName );
-            }
-
-            Artisan::call( 'optimize:clear' );
-
-            $this->info("all requirements created successfully");
 
         } else {
-            $this->error( 'No fields provided. Migration creation aborted.' );
+            $this->error( 'The requested file is currently unavailable' );
         }
     }
 

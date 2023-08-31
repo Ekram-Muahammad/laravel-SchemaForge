@@ -12,7 +12,7 @@ class ResoureController {
         // Run the make:controller command
         Artisan::call( 'make:controller', [
             'name' => $controllerName,
-        ] );
+        ]);
 
         $controllerContent = $this->generateResourceMethods( $fields, $modelName, $controllerName, $tableName );
 

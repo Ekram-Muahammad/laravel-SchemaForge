@@ -10,7 +10,7 @@ class Factory {
         // Generate the factory content
         $factoryContent = $this->generateFactoryContent( $tableName, $fields );
 
-        $modelClassName = Str::studly( $tableName );
+        $modelClassName = Str::ucfirst( $tableName );
 
         // Generate the factory file
         Artisan::call( 'make:factory', [
