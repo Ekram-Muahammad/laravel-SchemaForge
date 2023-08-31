@@ -5,6 +5,7 @@ use Illuminate\Support\Str;
 
 class Field {
     public function generateFields( $columns ) {
+
         $fields = [];
         $relationships = [];
 
