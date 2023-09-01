@@ -88,18 +88,6 @@ Begin by creating a JSON file that contains the schema data for your database. T
             "hasRelation": false,
             "relatedTable":"",
             "relatedColumn":""
-        },
-        {
-            "name": "remember_token",
-            "type": "string",
-            "length": "100",
-            "nullable": true,
-            "unique": false,
-            "defaultValue": "",
-            "index": "",
-            "hasRelation": false,
-            "relatedTable":"",
-            "relatedColumn":""
         }
     ]
 }
