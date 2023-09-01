@@ -1,4 +1,4 @@
-# Laravel SchemaForgexww
+# Laravel SchemaForge
 
 ## Overview
 
