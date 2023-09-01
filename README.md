@@ -99,9 +99,16 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
 + Once you have your JSON schema file ready, open your terminal and run the following command:
 
 ```bash
-php artisan make:crud your-json-file-name
+php artisan make:crud your-json-file-name [update|reset]
 ```
-Replace your-json-file-name.json with the actual name of your JSON file.
+x
+Replace your-json-file-name with the actual name of your JSON file.
+
+### [update|reset]: This parameter is optional and accepts two values:
+
++ update: Use this option to update the generated files. It will override existing files with the newly generated ones if there are any changes in the JSON schema or if you want to refresh the generated code.
+
++ reset: Use this option to reset the generated files. It will delete all previously generated files, ensuring a clean and fresh set of code files.
 
 
 ### Step 3: Review the Generated Files
