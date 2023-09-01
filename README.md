@@ -76,8 +76,13 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
             "defaultValue": "",
             "index": "Unique",
             "hasRelation": false,
-            "relatedTable":"",
-            "relatedColumn":""
+            "relation":{
+                "relationType":"",
+                "relatedTable":"",
+                "relatedColumn":"",
+                "intermediateModel":"",
+                "targetModel":""
+            }
         },
         {
             "name": "password",
