@@ -164,5 +164,6 @@ The primary purpose of the db:clone command is to capture your current database 
 If you have any questions, encounter issues, or need assistance with the Laravel SchemaForge package, please feel free to reach out to us. You can contact us via email at:
 
 - Email: [ekram.developer@gmail.com](mailto:ekram.developer@gmail.com)
+- Phone: +964 750 180 4528
 
 We value your feedback and are here to help you make the most of our package.
