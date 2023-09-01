@@ -31,4 +31,4 @@
 You can install this package via Composer. Run the following command:
 
 ```bash
-composer require your-package-name
+composer require ArtisanCrudServiceProvider
