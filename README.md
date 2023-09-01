@@ -32,3 +32,43 @@ You can install this package via Composer. Run the following command:
 
 ```bash
 composer require ArtisanCrudServiceProvider
+
+
+## How to Use
+
+The `php artisan make:crud` command is a powerful tool provided by Laravel SchemaForge that automates the creation of database schema and controllers with CRUD views based on the data provided in a JSON file. Follow these steps to use this command effectively:
+
+### Step 1: Create a JSON File
+
+Begin by creating a JSON file that contains the schema data for your database. This file should describe the tables and fields you want to generate. Here's an example of a basic JSON schema file:
+
+```json
+{
+    "tables": [
+        {
+            "name": "users",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "increments"
+                },
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "email",
+                    "type": "string"
+                },
+                {
+                    "name": "created_at",
+                    "type": "timestamp"
+                },
+                {
+                    "name": "updated_at",
+                    "type": "timestamp"
+                }
+            ]
+        }
+    ]
+}
