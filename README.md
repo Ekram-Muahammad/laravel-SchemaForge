@@ -108,9 +108,15 @@ Replace your-json-file-name.json with the actual name of your JSON file.
 After executing the command, Laravel SchemaForge will generate several files and directories for you. These include:
 
 + Database migrations for creating the specified tables and fields.
+
 + Laravel SchemaForge generates a primary API controller inside the app/Http/Controllers/Api directory. This controller serves as the entry point for your API endpoints.
+
 + additionally, it creates a separate controller for API resource methods. This controller is also placed inside the app/Http/Controllers/Api directory. It provides methods for handling standard API CRUD operations like fetching, creating, updating, and deleting records.
+
 + Blade view files for creating, reading, updating, and deleting records.
+
 + Seeder and Factory files for populating your database with sample data.
+
 + Laravel SchemaForge automatically configures the routes for your API in the routes/api.php file. It defines the necessary routes to access the API endpoints.
+
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
