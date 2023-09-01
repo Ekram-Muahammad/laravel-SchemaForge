@@ -45,31 +45,63 @@ Begin by creating a JSON file that contains the schema data for your database. T
 
 ```json
 {
-    "tables": [
+    "tableName": "users",
+    "migration": true,
+    "seeder": true,
+    "seederNumRows": 10,
+    "resourceController": true,
+    "apiController": true,
+    "views": true,
+    "columns": [
         {
-            "name": "users",
-            "fields": [
-                {
-                    "name": "id",
-                    "type": "increments"
-                },
-                {
-                    "name": "name",
-                    "type": "string"
-                },
-                {
-                    "name": "email",
-                    "type": "string"
-                },
-                {
-                    "name": "created_at",
-                    "type": "timestamp"
-                },
-                {
-                    "name": "updated_at",
-                    "type": "timestamp"
-                }
-            ]
+            "name": "name",
+            "type": "string",
+            "length": "255",
+            "nullable": false,
+            "unique": false,
+            "defaultValue": "",
+            "index": "",
+            "hasRelation": false
+        },
+        {
+            "name": "email",
+            "type": "string",
+            "length": "255",
+            "nullable": false,
+            "unique": true,
+            "defaultValue": "",
+            "index": "Unique",
+            "hasRelation": false
+        },
+        {
+            "name": "email_verified_at",
+            "type": "timestamp",
+            "length": "255",
+            "nullable": true,
+            "unique": false,
+            "defaultValue": "",
+            "index": "",
+            "hasRelation": false
+        },
+        {
+            "name": "password",
+            "type": "string",
+            "length": "255",
+            "nullable": false,
+            "unique": false,
+            "defaultValue": "",
+            "index": "",
+            "hasRelation": false
+        },
+        {
+            "name": "remember_token",
+            "type": "string",
+            "length": "100",
+            "nullable": true,
+            "unique": false,
+            "defaultValue": "",
+            "index": "",
+            "hasRelation": false
         }
     ]
 }
