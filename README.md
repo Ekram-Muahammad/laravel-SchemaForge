@@ -41,7 +41,7 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
 
 ### Step 1: Create a JSON File
 
-+ On your Laravel project's root directory, create a new directory named "cruds" if it doesn't already exist. This directory will serve as the location for your JSON schema files.
++ On your Laravel project's root directory, create a new directory named `cruds` if it doesn't already exist. This directory will serve as the location for your JSON schema files.
 
 + Begin by creating a JSON file that contains the schema data for your database. This file should describe the tables and fields you want to generate. Here's an example of a basic JSON schema file:
 
@@ -114,7 +114,7 @@ php artisan make:crud your-json-file-name [action]
 
 + Replace your-json-file-name with the actual name of your JSON file.
 
-### [action]: This parameter is optional and accepts two values:
+## [action]: This parameter is optional and accepts two values:
 
 + update: Use this option to update the generated files. It will override existing files with the newly generated ones if there are any changes in the JSON schema or if you want to refresh the generated code.
 
@@ -128,7 +128,7 @@ After executing the command, Laravel SchemaForge will generate several files and
 
 + Laravel SchemaForge generates a primary API controller inside the app/Http/Controllers/Api directory. This controller serves as the entry point for your API endpoints.
 
-+ additionally, it creates a separate controller for API resource methods. This controller is also placed inside the app/Http/Controllers/Api directory. It provides methods for handling standard API CRUD operations like fetching, creating, updating, and deleting records.
++ additionally, it creates a separate controller for API resource methods. This controller is also placed inside the app/Http/Controllers/ directory. It provides methods for handling standard API CRUD operations like fetching, creating, updating, and deleting records.
 
 + Blade view files for creating, reading, updating, and deleting records.
 
@@ -138,7 +138,6 @@ After executing the command, Laravel SchemaForge will generate several files and
 
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
 
-....................................
 
 # Command: php artisan db:clone
 
