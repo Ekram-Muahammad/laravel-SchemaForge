@@ -41,9 +41,9 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
 
 ### Step 1: Create a JSON File
 
-+ on your Laravel project's root directory, create a new directory named "cruds" if it doesn't already exist. This directory will serve as the location for your JSON schema files.
++ On your Laravel project's root directory, create a new directory named "cruds" if it doesn't already exist. This directory will serve as the location for your JSON schema files.
 
-++ Begin by creating a JSON file that contains the schema data for your database. This file should describe the tables and fields you want to generate. Here's an example of a basic JSON schema file:
++ Begin by creating a JSON file that contains the schema data for your database. This file should describe the tables and fields you want to generate. Here's an example of a basic JSON schema file:
 
 ```json
 {
