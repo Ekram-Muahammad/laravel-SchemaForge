@@ -64,13 +64,14 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
             "defaultValue": "",          // Default value for the column (empty string if none).
             "index": "",                 // Index type for the column (e.g., "Unique" or ""). Leave empty if no index.
             "hasRelation": false,        // Whether this column has a relationship to another table (true or false).
-            "hasRelation": false,
             "relation":{
-                "relationType":"",
-                "relatedTable":"",
-                "relatedColumn":"",
-                "intermediateModel":"",
-                "targetModel":""
+                "relationType":"",       // Type of relationship (e.g., "belongsTo", "hasMany", "belongsToMany").
+                "relatedTable":"",       // Name of the related table.
+                "relatedColumn":"",      // Name of the related column in the related table.
+                
+                // Define a "hasManyThrough" relationship with the "tags" table.
+                "intermediateModel":"",  // Name of the intermediate model (if applicable, otherwise leave empty).
+                "targetModel":""         // Name of the target model (if applicable, otherwise leave empty).
             }
         },
         {
