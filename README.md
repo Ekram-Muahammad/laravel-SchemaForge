@@ -32,6 +32,7 @@ You can install this package via Composer. Run the following command:
 
 ```bash
 composer require ArtisanCrudServiceProvider
+```
 
 
 ## How to Use
@@ -72,3 +73,4 @@ Begin by creating a JSON file that contains the schema data for your database. T
         }
     ]
 }
+```
