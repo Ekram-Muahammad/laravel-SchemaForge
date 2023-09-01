@@ -183,7 +183,7 @@ class CloneCommand extends Command {
 
             }
 
-            $crudPath = base_path() . '/cruds/';
+            $crudPath = base_path() . '/schemas/';
 
             if ( !file_exists( $crudPath ) ) {
                 File::makeDirectory( $crudPath );

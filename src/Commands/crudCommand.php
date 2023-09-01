@@ -29,7 +29,7 @@ class CrudCommand extends Command {
 
         $jsonFile = $this->argument( 'jsonFile' );
 
-        if ( file_exists( base_path( '/cruds/' . $jsonFile . '.json' ) ) ) {
+        if ( file_exists( base_path( '/schemas/' . $jsonFile . '.json' ) ) ) {
 
             try {
                 //code...
@@ -39,7 +39,7 @@ class CrudCommand extends Command {
                 return;
             }
 
-            $jsonFile = file_get_contents( base_path( '/cruds/' . $jsonFile . '.json' ) );
+            $jsonFile = file_get_contents( base_path( '/schemas/' . $jsonFile . '.json' ) );
 
             $jsonData = json_decode( $jsonFile, true );
 
