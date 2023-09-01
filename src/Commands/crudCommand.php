@@ -55,7 +55,7 @@ class CrudCommand extends Command {
                 new Reset( $tableName );
             }
 
-            if ( !Schema::hasTable( $tableName ) ) {
+           // if ( !Schema::hasTable( $tableName ) ) {
 
                 $modelName = Str::ucfirst( $tableName );
 
@@ -131,9 +131,10 @@ class CrudCommand extends Command {
                 } else {
                     $this->error( 'Not Fields provided' );
                 }
-            } else {
-                $this->error( "The table $tableName exists in the database." );
-            }
+            //} 
+            // else {
+            //     $this->error( "The table $tableName exists in the database." );
+            // }
 
         } else {
             $this->error( 'The requested file is currently unavailable' );

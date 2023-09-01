@@ -39,7 +39,7 @@ class Factory {
             }
         }
 
-        return str_replace( [ '{{modelClassName}}', '{{attributes}}' ], [ $modelClassName, implode( '\n', $attributes ) ], $factoryStub );
+        return str_replace( [ '{{modelClassName}}', '{{attributes}}' ], [ $modelClassName, implode( PHP_EOL, $attributes ) ], $factoryStub );
     }
 
     public function addHasFactoryTrait( $tableName ) {

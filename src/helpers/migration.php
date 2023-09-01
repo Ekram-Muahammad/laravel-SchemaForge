@@ -54,8 +54,11 @@ class Migration {
         $migrationName = date( 'Y_m_d_His' ) . '_create_' . $tableName . '_table';
 
         file_put_contents( database_path( 'migrations' ) . '/' . $migrationName . '.php', $migrationContent );
-
-        Artisan::call( 'migrate' );
+        try {
+            Artisan::call( 'migrate' );
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
 
     }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class CloneCommand extends Command {
-    protected $signature = 'clone';
+    protected $signature = 'db:clone';
 
     protected $description = 'Convert Database schema to json';
 
@@ -91,6 +91,11 @@ class CloneCommand extends Command {
 
             foreach ( $columns as $column ) {
                 $columnName = $column->Field;
+
+                if (in_array( $columnName, [ 'id', 'created_at', 'updated_at' ] ) ) {
+                    continue;
+                }
+
                 $field[ 'name' ] = $column->Field;
 
                 $databaseColumnType =  $column->Type;
@@ -162,33 +167,32 @@ class CloneCommand extends Command {
                 $relatedColumn = '';
                 if ( $field[ 'hasRelation' ] ) {
                     $constraintInfo = DB::select( "
-                        SELECT
-                            TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
-                        FROM
-                            information_schema.KEY_COLUMN_USAGE
-                        WHERE
-                            TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName'
-                    " );
+                            SELECT
+                                TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+                            FROM
+                                information_schema.KEY_COLUMN_USAGE
+                            WHERE
+                                TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName'
+                        " );
                     if ( !empty( $constraintInfo ) ) {
                         $column[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME;
                         $column[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME;
                     }
                 }
-
                 $table[ 'columns' ][] = $field;
 
-                $crudPath = base_path() . '/cruds/';
+            }
 
-                if ( !file_exists( $crudPath ) ) {
-                    File::makeDirectory( $crudPath );
+            $crudPath = base_path() . '/cruds/';
 
-                }
-
-                $filePath = $crudPath.$tableName.'.json';
-
-                file_put_contents( $filePath, json_encode( $table ) );
+            if ( !file_exists( $crudPath ) ) {
+                File::makeDirectory( $crudPath );
 
             }
+
+            $filePath = $crudPath.$tableName.'.json';
+
+            file_put_contents( $filePath, json_encode( $table ) );
         }
     }
 }

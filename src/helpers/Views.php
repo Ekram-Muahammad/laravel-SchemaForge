@@ -146,7 +146,7 @@ class Views {
         }
 
         $createStub = file_get_contents(__DIR__ . '/stubs/views/create.stub');
-        $createView = str_replace(['{{tableName}', '{{formFields}}'], [$tableName, $formFields], $createStub);
+        $createView = str_replace(['{{tableName}}', '{{formFields}}'], [$tableName, $formFields], $createStub);
 
 
         $updateStub =file_get_contents(__DIR__ . '/stubs/views/edit.stub');
