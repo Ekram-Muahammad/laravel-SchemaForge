@@ -1,13 +1,13 @@
 <?php
 
-namespace Ekram\ArtisanCrud;
+namespace Ekram\SchemaForge;
 
-use Ekram\ArtisanCrud\Commands\CrudCommand;
-use Ekram\ArtisanCrud\Commands\CloneCommand;
+use Ekram\SchemaForge\Commands\CrudCommand;
+use Ekram\SchemaForge\Commands\CloneCommand;
 
 use Illuminate\Support\ServiceProvider;
 
-class ArtisanCrudServiceProvider extends ServiceProvider
+class SchemaForgeServiceProvider extends ServiceProvider
 {
     /**
      * Register services.

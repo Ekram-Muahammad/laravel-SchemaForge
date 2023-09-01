@@ -1,19 +1,19 @@
 <?php return array(
     'root' => array(
-        'name' => 'ekram/artisan-crud',
+        'name' => 'ekram/schema-forge',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '37ec3f8230b454c01d5c271d1b13b5d386532986',
+        'reference' => 'bbfbb739dd201ece159753414a2cbb326955d3c2',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
         'dev' => true,
     ),
     'versions' => array(
-        'ekram/artisan-crud' => array(
+        'ekram/schema-forge' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '37ec3f8230b454c01d5c271d1b13b5d386532986',
+            'reference' => 'bbfbb739dd201ece159753414a2cbb326955d3c2',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

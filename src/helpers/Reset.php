@@ -1,6 +1,6 @@
 <?php
 
-namespace Ekram\ArtisanCrud\Helpers;
+namespace Ekram\SchemaForge\Helpers;
 
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;

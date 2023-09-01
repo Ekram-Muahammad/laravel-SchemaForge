@@ -9,12 +9,12 @@ class ComposerStaticInitd5f90f866511938b06cfa4fe27aea8be
     public static $prefixLengthsPsr4 = array (
         'E' => 
         array (
-            'Ekram\\ArtisanCrud\\' => 18,
+            'Ekram\\SchemaForge\\' => 18,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Ekram\\ArtisanCrud\\' => 
+        'Ekram\\SchemaForge\\' => 
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

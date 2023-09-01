@@ -1,20 +1,20 @@
 <?php
 
-namespace Ekram\ArtisanCrud\Commands;
-use Ekram\ArtisanCrud\Helpers\ApiController;
-use Ekram\ArtisanCrud\Helpers\Factory;
-use Ekram\ArtisanCrud\Helpers\ResoureController;
-use Ekram\ArtisanCrud\Helpers\Seeder;
-use Ekram\ArtisanCrud\Helpers\Views;
+namespace Ekram\SchemaForge\Commands;
+use Ekram\SchemaForge\Helpers\ApiController;
+use Ekram\SchemaForge\Helpers\Factory;
+use Ekram\SchemaForge\Helpers\ResoureController;
+use Ekram\SchemaForge\Helpers\Seeder;
+use Ekram\SchemaForge\Helpers\Views;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
-use Ekram\ArtisanCrud\Helpers\Migration;
-use Ekram\ArtisanCrud\Helpers\Model;
-use Ekram\ArtisanCrud\Helpers\Field;
+use Ekram\SchemaForge\Helpers\Migration;
+use Ekram\SchemaForge\Helpers\Model;
+use Ekram\SchemaForge\Helpers\Field;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Ekram\ArtisanCrud\Helpers\Reset;
+use Ekram\SchemaForge\Helpers\Reset;
 
 class CrudCommand extends Command {
     protected $signature = 'make:crud {jsonFile} {action?}';

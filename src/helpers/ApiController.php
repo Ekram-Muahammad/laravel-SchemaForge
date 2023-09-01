@@ -1,9 +1,9 @@
 <?php
-namespace Ekram\ArtisanCrud\Helpers;
+namespace Ekram\SchemaForge\Helpers;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
-use Ekram\ArtisanCrud\Helpers\Validation;
+use Ekram\SchemaForge\Helpers\Validation;
 
 class ApiController {
     public function generateApiController( $tableName, $fields, $modelName ) {

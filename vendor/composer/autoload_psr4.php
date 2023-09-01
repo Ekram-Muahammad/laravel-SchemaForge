@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Ekram\\ArtisanCrud\\' => array($baseDir . '/src'),
+    'Ekram\\SchemaForge\\' => array($baseDir . '/src'),
 );

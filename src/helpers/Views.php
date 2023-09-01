@@ -1,5 +1,5 @@
 <?php
-namespace Ekram\ArtisanCrud\Helpers;
+namespace Ekram\SchemaForge\Helpers;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;

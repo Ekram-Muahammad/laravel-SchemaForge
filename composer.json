@@ -1,16 +1,16 @@
 {
-    "name": "ekram/artisan-crud",
+    "name": "ekram/schema-forge",
     "description": "Laravel Package to create crud operation",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Ekram\\ArtisanCrud\\": "src/"
+            "Ekram\\SchemaForge\\": "src/"
         }
     },
     "authors": [
         {
             "name": "Ekram Amin",
-            "email": "114848248+EkramAminTornet@users.noreply.github.com"
+            "email": "ekram.developer@gmail.com"
         }
     ],
     "minimum-stability": "dev",
@@ -18,7 +18,7 @@
     "extra": {
         "Laravel" : {
             "providers" : [
-                "Ekram\\ArtisanCrud\\ArtisanCrudServiceProvider"
+                "Ekram\\SchemaForge\\SchemaForgeServiceProvider"
             ]
         }
     }

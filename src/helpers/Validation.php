@@ -1,5 +1,5 @@
 <?php
-namespace Ekram\ArtisanCrud\Helpers;
+namespace Ekram\SchemaForge\Helpers;
 
 class Validation {
 
