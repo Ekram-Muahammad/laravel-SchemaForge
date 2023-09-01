@@ -45,7 +45,7 @@ class Field {
                 $relationType = $column[ 'relationType' ];
 
                 $relatedTable = '';
-                $primaryKey = '';
+                $relatedColumn = '';
 
                 if ( $relationType == 'morphTo' ) {
                     $relatedModelName = $fieldName;
@@ -55,12 +55,12 @@ class Field {
                     $relatedModelName = $fieldName;
                 } else {
                     $relatedTable = $column[ 'relatedTable' ];
-                    $primaryKey = $column[ 'primaryKey' ];
+                    $relatedColumn = $column[ 'relatedColumn' ];
                     // Generate related model name
                     $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
                 }
 
-                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'primaryKey', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
+                $fields[] = compact( 'fieldName', 'fieldType', 'isForeignKey', 'relatedTable', 'relatedColumn', 'fieldProperties', 'defaultValue', 'nullable', 'unique', 'index' );
 
                 $relationships[] = [
                     'relationName' => Str::lower( Str::singular( $relatedModelName ) ),

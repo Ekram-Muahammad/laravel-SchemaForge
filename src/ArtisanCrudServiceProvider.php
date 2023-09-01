@@ -3,6 +3,8 @@
 namespace Ekram\ArtisanCrud;
 
 use Ekram\ArtisanCrud\Commands\CrudCommand;
+use Ekram\ArtisanCrud\Commands\CloneCommand;
+
 use Illuminate\Support\ServiceProvider;
 
 class ArtisanCrudServiceProvider extends ServiceProvider
@@ -14,7 +16,8 @@ class ArtisanCrudServiceProvider extends ServiceProvider
     {
 
         $this->commands([
-            CrudCommand::class
+            CrudCommand::class,
+            CloneCommand::class
         ]);
     }
 

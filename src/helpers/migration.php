@@ -11,7 +11,7 @@ class Migration {
         foreach ( $fields as $field ) {
             if ( $field[ 'isForeignKey' ] ) {
                 $fieldsContent .= sprintf( "\$table->foreignId('%s')->constrained('%s', '%s')", $field[ 'fieldName' ],
-                $field[ 'relatedTable' ], $field[ 'primaryKey' ] );
+                $field[ 'relatedTable' ], $field[ 'relatedColumn' ] );
             } else {
                 $fieldsContent .= sprintf( "\$table->%s('%s')", $field[ 'fieldType' ], $field[ 'fieldName' ] );
             }
