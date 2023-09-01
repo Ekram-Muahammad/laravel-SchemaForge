@@ -56,16 +56,16 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
     "views": true,                       // Set to true if you want to generate views for this table.
     "columns": [
         {
-            "name": "name",
-            "type": "string",
-            "length": "255",
-            "nullable": false,
-            "unique": false,
-            "defaultValue": "",
-            "index": "",
-            "hasRelation": false,
-            "relatedTable":"",
-            "relatedColumn":""
+            "name": "name",              // Column name for the user's name.   
+            "type": "string",            // Data type for the column (e.g., "string")
+            "length": "255",             // length for the Column (e.g., "255").
+            "nullable": false,           // Whether the column can be nullable (true or false).
+            "unique": false,             // Whether the column should have a unique constraint (true or false).
+            "defaultValue": "",          // Default value for the column (empty string if none).
+            "index": "",                 // Index type for the column (e.g., "Unique" or ""). Leave empty if no index.
+            "hasRelation": false,        // Whether this column has a relationship to another table (true or false).
+            "relatedTable":"",           // If "hasRelation" is true, specify the related table here (empty if none).
+            "relatedColumn":""           // If "hasRelation" is true, specify the related column here (empty if none).
         },
         {
             "name": "email",
