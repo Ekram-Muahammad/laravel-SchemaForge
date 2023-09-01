@@ -61,7 +61,9 @@ Begin by creating a JSON file that contains the schema data for your database. T
             "unique": false,
             "defaultValue": "",
             "index": "",
-            "hasRelation": false
+            "hasRelation": false,
+            "relatedTable":"",
+            "relatedColumn":""
         },
         {
             "name": "email",
@@ -71,17 +73,9 @@ Begin by creating a JSON file that contains the schema data for your database. T
             "unique": true,
             "defaultValue": "",
             "index": "Unique",
-            "hasRelation": false
-        },
-        {
-            "name": "email_verified_at",
-            "type": "timestamp",
-            "length": "255",
-            "nullable": true,
-            "unique": false,
-            "defaultValue": "",
-            "index": "",
-            "hasRelation": false
+            "hasRelation": false,
+            "relatedTable":"",
+            "relatedColumn":""
         },
         {
             "name": "password",
@@ -91,7 +85,9 @@ Begin by creating a JSON file that contains the schema data for your database. T
             "unique": false,
             "defaultValue": "",
             "index": "",
-            "hasRelation": false
+            "hasRelation": false,
+            "relatedTable":"",
+            "relatedColumn":""
         },
         {
             "name": "remember_token",
@@ -101,7 +97,9 @@ Begin by creating a JSON file that contains the schema data for your database. T
             "unique": false,
             "defaultValue": "",
             "index": "",
-            "hasRelation": false
+            "hasRelation": false,
+            "relatedTable":"",
+            "relatedColumn":""
         }
     ]
 }
