@@ -40,9 +40,9 @@ class Field {
                 $hasRelation = $column[ 'hasRelation' ];
             }
 
-            if ( $hasRelation ) {
+            if ( $hasRelation && isset( $column[ 'relation' ] ) ) {
                 // generate model relations
-                $relationType = $column[ 'relationType' ];
+                $relationType = $column[ 'relation' ][ 'relationType' ];
 
                 $relatedTable = '';
                 $relatedColumn = '';
@@ -50,12 +50,12 @@ class Field {
                 if ( $relationType == 'morphTo' ) {
                     $relatedModelName = $fieldName;
                 } elseif ( $relationType == 'hasManyThrough' ) {
-                    $intermediateModel = $column[ 'intermediateModel' ];
-                    $targetModel = $column[ 'targetModel' ];
+                    $intermediateModel = $column[ 'relation' ][ 'intermediateModel' ];
+                    $targetModel = $column[ 'relation' ][ 'targetModel' ];
                     $relatedModelName = $fieldName;
                 } else {
-                    $relatedTable = $column[ 'relatedTable' ];
-                    $relatedColumn = $column[ 'relatedColumn' ];
+                    $relatedTable = $column[ 'relation' ] [ 'relatedTable' ];
+                    $relatedColumn = $column[ 'relation' ][ 'relatedColumn' ];
                     // Generate related model name
                     $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
                 }
