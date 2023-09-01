@@ -54,7 +54,12 @@ class Seeder {
 
         file_put_contents( $seederFilePath, $seederContent );
 
-        Artisan::call( 'db:seed' );
+        try {
+            Artisan::call( 'db:seed' );
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        
     }
 
 }

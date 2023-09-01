@@ -69,9 +69,10 @@ class CrudCommand extends Command {
 
                 if ( !empty( $fields ) ) {
 
-                    $migrationController = new Migration();
-
-                    $migrationController->generateMigrationContent( $tableName, $fields );
+                    if ($jsonData[ 'migration']) {
+                        $migrationController = new Migration();
+                        $migrationController->generateMigrationContent( $tableName, $fields );
+                    }
 
                     $modelController = new Model();
 
@@ -79,7 +80,7 @@ class CrudCommand extends Command {
 
                     // create seeder
 
-                    $createSeeder = $jsonData[ 'createSeeder' ] ?? false;
+                    $createSeeder = $jsonData[ 'seeder' ] ?? false;
 
                     if ( $createSeeder ) {
                         $numRows = $jsonData[ 'seederNumRows' ] ?? 10;
@@ -93,7 +94,7 @@ class CrudCommand extends Command {
                         $factory->addHasFactoryTrait( $tableName );
 
                         // Generate the seeder file
-
+                        
                         $seeder = new Seeder();
                         $seeder->generateSeederFile( $tableName );
                         // Generate the seeder file content
@@ -102,7 +103,9 @@ class CrudCommand extends Command {
 
                     $createController = $jsonData[ 'resourceController' ] ?? false;
 
-                    if ( $createController ) {
+                    $createBladeView = $jsonData[ 'views' ] ?? false;
+
+                    if ( $createController || $createBladeView ) {
                         $resourceController = new ResoureController();
                         $resourceController->generateController( $tableName, $fields, $modelName );
                     }
@@ -114,8 +117,7 @@ class CrudCommand extends Command {
                         $apiController->generateApiController( $tableName, $fields, $modelName );
                     }
 
-                    $createBladeView = $jsonData[ 'views' ] ?? false;
-
+                  
                     if ( $createBladeView ) {
                         $views = new Views();
                         $views->generateBladeViews( $tableName, $fields );
