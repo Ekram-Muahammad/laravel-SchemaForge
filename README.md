@@ -101,8 +101,8 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
 ```bash
 php artisan make:crud your-json-file-name [update|reset]
 ```
-x
-Replace your-json-file-name with the actual name of your JSON file.
+
++ Replace your-json-file-name with the actual name of your JSON file.
 
 ### [update|reset]: This parameter is optional and accepts two values:
 
