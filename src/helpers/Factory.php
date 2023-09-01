@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 class Factory {
 
     // create factory
+
     public function generateFactory( $tableName, $modelClassName, $fields ) {
         // Generate the factory content
         $factoryContent = $this->generateFactoryContent( $tableName, $fields );
@@ -16,7 +17,7 @@ class Factory {
         Artisan::call( 'make:factory', [
             'name' => "{$modelClassName}Factory",
             '--model' => "Models\\{$modelClassName}",
-        ]);
+        ] );
 
         $factoryFilePath = database_path( "factories/{$modelClassName}Factory.php" );
         file_put_contents( $factoryFilePath, $factoryContent );
@@ -34,6 +35,8 @@ class Factory {
 
             if ( in_array( $field[ 'fieldType' ], $foreignFieldTypes ) ) {
                 $attributes[] = "'{$field['fieldName']}' => \$this->faker->randomElement(\\App\\Models\\" . Str::studly( $field[ 'relatedTable' ] ) . "::pluck('id')),";
+            } else if ( $field[ 'fieldType' ] == 'enum' ) {
+                $attributes[] = "'{$field['fieldName']}' => \$this->faker->randomElement(['".implode("','",$field['fieldProperties']['enumValues'])."']),";
             } else {
                 $attributes[] = "'{$field['fieldName']}' => \$this->faker->{$fakerMethod}(),";
             }
@@ -57,13 +60,13 @@ class Factory {
 
                 file_put_contents( $modelFilePath, $updatedModelContent );
             } else {
-            //    Artisan::info( "{$modelClassName} model already uses HasFactory trait." );
+                //    Artisan::info( "{$modelClassName} model already uses HasFactory trait." );
             }
         }
     }
 
     protected function getFakerMethodForField( $fieldType ) {
-        
+
         $fakerMethodMap = [
             'string' => 'word',
             'text' => 'text',
@@ -93,6 +96,6 @@ class Factory {
             'day' => 'dayOfMonth',
         ];
 
-        return $fakerMethodMap[$fieldType] ?? 'word';
+        return $fakerMethodMap[ $fieldType ] ?? 'word';
     }
 }

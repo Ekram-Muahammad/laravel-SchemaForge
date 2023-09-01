@@ -12,13 +12,18 @@ class Migration {
             if ( $field[ 'isForeignKey' ] ) {
                 $fieldsContent .= sprintf( "\$table->foreignId('%s')->constrained('%s', '%s')", $field[ 'fieldName' ],
                 $field[ 'relatedTable' ], $field[ 'relatedColumn' ] );
+            } else if ( $field[ 'fieldType' ] == 'enum' ) {
+                $enumValues=implode('\',\'',$field['fieldProperties']['enumValues']);
+                $fieldsContent .= sprintf( "\$table->enum('%s',['%s'])", $field[ 'fieldName' ],$enumValues );
             } else {
                 $fieldsContent .= sprintf( "\$table->%s('%s')", $field[ 'fieldType' ], $field[ 'fieldName' ] );
             }
 
             if ( isset( $field[ 'fieldProperties' ] ) ) {
                 foreach ( $field[ 'fieldProperties' ] as $property => $value ) {
-                    $fieldsContent .= "->{$property}({$value})";
+                    if ( $property != 'enumValues' ) {
+                        $fieldsContent .= "->{$property}({$value})";
+                    }
                 }
             }
 
@@ -45,18 +50,18 @@ class Migration {
 
         $tb = Str::ucfirst( $tableName );
 
-        $migrationStubContent= file_get_contents( __DIR__ . '/stubs/migration.stub' );
+        $migrationStubContent = file_get_contents( __DIR__ . '/stubs/migration.stub' );
 
         $migrationContent = str_replace( [ '{{migrateName}}', '{{tableName}}', '{{fields}}' ], [ $tb,
 
-        Str::lower($tableName), $fieldsContent ],$migrationStubContent );
+        Str::lower( $tableName ), $fieldsContent ], $migrationStubContent );
 
-        $migrationName = date( 'Y_m_d_His' ) . '_create_' . $tableName . '_table';
+        $migrationName = date( 'Y_m_d_His' ) . '_create_' . Str::studly($tableName) . '_table';
 
         file_put_contents( database_path( 'migrations' ) . '/' . $migrationName . '.php', $migrationContent );
         try {
             Artisan::call( 'migrate' );
-        } catch (\Throwable $th) {
+        } catch ( \Throwable $th ) {
             //throw $th;
         }
 

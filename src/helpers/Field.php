@@ -25,7 +25,7 @@ class Field {
                 $fieldProperties[ 'precision' ] = $column[ 'length' ];
                 $fieldProperties[ 'scale' ] = $column[ 'precision' ];
             } elseif ( $fieldType === 'enum' ) {
-                $enumValues = $column[ 'values' ];
+                $enumValues = $column[ 'enum_values' ];
                 $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
             }
 
@@ -37,7 +37,12 @@ class Field {
                 $hasRelation = true;
             } else {
                 // to morph
-                $hasRelation = $column[ 'hasRelation' ];
+                if ( isset( $column[ 'hasRelation' ] ) ) {
+                    $hasRelation = $column[ 'hasRelation' ];
+                } else {
+                    $hasRelation = false;
+                }
+
             }
 
             if ( $hasRelation && isset( $column[ 'relation' ] ) ) {

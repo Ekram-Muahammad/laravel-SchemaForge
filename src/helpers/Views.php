@@ -230,11 +230,11 @@ class Views {
 
     public function generateEnumField($field)
     {
-        $enumValues = $field['fieldProperties']['enum_values'];
+        $enumValues = $field['fieldProperties']['enumValues'];
 
         $options = "";
         foreach ($enumValues as $value) {
-            $options .= "<option value=\"$value\">{{ \$value }}</option>";
+            $options .= "<option value=\"$value\">$value</option>";
         }
         $enumStub = file_get_contents(__DIR__ . '/stubs/form/enum.stub');
         $enumField = str_replace(['{{$fieldName}}', '{{options}}'], [$field['fieldName'], $options], $enumStub);

@@ -14,21 +14,21 @@ class Model {
 
         foreach ( $relationships as $relationship ) {
             if ( $relationship[ 'relationType' ] === 'morphTo' ) {
-                $relationFunction = "\n    public function {$relationship['fieldName']}()\n    {\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['fieldName']}()\n    {\n";
                 $relationFunction .= "        return \$this->{$relationship['relationType']}();\n";
-                $relationFunction .= '    }\n';
+                $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             } elseif ( $relationship[ 'relationType' ] === 'hasManyThrough' ) {
                 $intermediateModelName = Str::studly( $relationship[ 'intermediateModel' ] );
                 $targetModelName = Str::studly( $relationship[ 'targetModel' ] );
-                $relationFunction = "\n    public function {$relationship['relationName']}()\n    {\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()\n    {\n";
                 $relationFunction .= "        return \$this->{$relationship['relationType']}({$targetModelName}::class, {$intermediateModelName}::class);\n";
-                $relationFunction .= '    }\n';
+                $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             } else {
-                $relationFunction = "\n    public function {$relationship['relationName']}()\n    {\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()\n    {\n";
                 $relationFunction .= "        return \$this->{$relationship['relationType']}({$relationship['relatedModelName']}::class, '{$relationship['fieldName']}');\n";
-                $relationFunction .= '    }\n';
+                $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             }
         }
