@@ -47,8 +47,8 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
 
 ```json
 {
-    "tableName": "users",
-    "migration": true,
+    "tableName": "users",      
+    "migration": true,    // if you want create a migration 
     "seeder": true,
     "seederNumRows": 10,
     "resourceController": true,
