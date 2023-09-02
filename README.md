@@ -139,7 +139,7 @@ After executing the command, Laravel SchemaForge will generate several files and
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
 
 
-# Command: php artisan db:clone {tanleName}
+# Command: php artisan db:clone tanleName
 
 ```bash
 php artisan db:clone tableName
