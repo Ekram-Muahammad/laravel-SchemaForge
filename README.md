@@ -139,10 +139,10 @@ After executing the command, Laravel SchemaForge will generate several files and
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
 
 
-# Command: php artisan db:clone
+# Command: php artisan db:clone {tanleName}
 
 ```bash
-php artisan db:clone
+php artisan db:clone tableName
 ```
 
 The php artisan db:clone command is a powerful utility provided by Laravel SchemaForge that allows you to clone all your database schema tables into JSON files, storing them in the `schemas` directory. This command serves as the foundation for creating various features described earlier, such as generating migrations, models, controllers, views, API resource methods, and more, based on your existing database structure.
