@@ -12,6 +12,8 @@
 
 + **API Resource Methods:** Generate API resource methods within your controllers, reducing manual coding efforts and accelerating the development of robust CRUD APIs.
 
++ **Validating Data Based on Column Types:** Laravel SchemaForge goes a step further in simplifying data validation by automatically generating validation rules based on the column types defined in your database schema. This feature ensures that incoming data adheres to the expected data types, enhancing data integrity and security.
+
 + **Data Seeding with Factory:** Automatically create seeders with factory data generators, allowing you to populate your database with sample data efficiently.
 
 + **Database Schema to JSON Conversion:** Easily convert your existing database schema to JSON files, enabling seamless migration and sharing of database structures.
