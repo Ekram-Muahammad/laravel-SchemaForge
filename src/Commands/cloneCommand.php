@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 class CloneCommand extends Command {
-    protected $signature = 'db:clone';
+    protected $signature = 'db:clone {tableName?}';
 
     protected $description = 'Convert Database schema to json';
 
@@ -69,13 +69,138 @@ class CloneCommand extends Command {
     ];
 
     public function handle() {
-        $tables = DB::select( 'SHOW TABLES' );
+        $schema = $this->argument( 'tableName' ) ?? 'all';
 
-        $table = [];
+        if ( $schema == 'all' ) {
+            $tables = DB::select( 'SHOW TABLES' );
 
-        foreach ( $tables as $tb ) {
-            $tableName = reset( $tb );
-            $table[ 'tableName' ] =  $tableName;
+            $table = [];
+
+            foreach ( $tables as $tb ) {
+                $tableName = reset( $tb );
+                $table[ 'tableName' ] =  $tableName;
+                $table[ 'migration' ] = true;
+                $table[ 'seeder' ] = true;
+                $table[ 'seederNumRows' ] = 10;
+                $table[ 'resourceController' ] = true;
+                $table[ 'apiController' ] = true;
+                $table[ 'views' ] = true;
+
+                $table[ 'columns' ] = [];
+                $field = [];
+
+                // Get the columns for each table
+                $columns = DB::select( "DESCRIBE {$table[ 'tableName' ]}" );
+
+                foreach ( $columns as $column ) {
+                    $columnName = $column->Field;
+
+                    if ( in_array( $columnName, [ 'id', 'created_at', 'updated_at' ] ) ) {
+                        continue;
+                    }
+
+                    $field[ 'name' ] = $column->Field;
+
+                    $databaseColumnType =  $column->Type;
+
+                    $field[ 'type' ] = 'string';
+                    // Default to string
+                    foreach ( $this->typeMapping as $dbType => $migrationType ) {
+                        if ( strpos( $databaseColumnType, $dbType ) !== false ) {
+                            $field[ 'type' ]  = $migrationType;
+
+                            try {
+                                if ( preg_match( '/\((\d+)\)/', $databaseColumnType, $matches ) ) {
+                                    $field[ 'length' ] = $matches[ 1 ];
+                                }
+                            } catch ( \Throwable $th ) {
+                                //throw $th;
+                            }
+
+                            try {
+                                if ( $dbType === 'decimal' || $dbType === 'numeric' ) {
+                                    if ( preg_match( '/\((\d+),(\d+)\)/', $databaseColumnType, $matches ) ) {
+                                        $field[ 'precision' ] = $matches[ 1 ];
+                                        $field[ 'scale' ] = $matches[ 2 ];
+                                    }
+                                }
+                            } catch ( \Throwable $th ) {
+                                //throw $th;
+                            }
+
+                            try {
+                                if ( $dbType === 'enum' ) {
+                                    // Extract enum values from the column type definition
+                                    if ( preg_match( '/\((.*?)\)/', $databaseColumnType, $matches ) ) {
+                                        $enumValues = explode( ',', $matches[ 1 ] );
+                                        // Remove surrounding single quotes and trim whitespace from enum values
+                                        $enumValues = array_map( function ( $value ) {
+                                            return trim( $value, "'" );
+                                        }
+                                        , $enumValues );
+
+                                        $field[ 'enum_values' ] = $enumValues;
+                                    }
+                                }
+                            } catch ( \Throwable $th ) {
+                                //throw $th;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    $field[ 'nullable' ] = $column->Null == 'YES' ? true : false;
+                    ;
+                    $field[ 'unique' ]  = $column->Key === 'UNI' ? true : false;
+                    $field[ 'defaultValue' ] = $column->Default ?? '';
+
+                    $field[ 'index' ] = '';
+                    if ( $column->Key === 'PRI' ) {
+                        $field[ 'index' ] = 'Primary';
+                    } elseif ( $column->Key === 'UNI' ) {
+                        $field[ 'index' ] = 'Unique';
+                    } elseif ( $column->Key === 'MUL' ) {
+                        $field[ 'index' ] = 'Index';
+                    }
+
+                    $field[ 'hasRelation' ] = $column->Key === 'MUL' ? true :false;
+
+                    $relatedTable = '';
+                    $relatedColumn = '';
+                    if ( $field[ 'hasRelation' ] ) {
+                        $constraintInfo = DB::select( "
+                                SELECT
+                                    TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+                                FROM
+                                    information_schema.KEY_COLUMN_USAGE
+                                WHERE
+                                    TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName'
+                            " );
+                        if ( !empty( $constraintInfo ) ) {
+                            $field[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME;
+                            $field[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME;
+                        }
+                    }
+                    $table[ 'columns' ][] = $field;
+                    $field=[];
+                }
+
+                $schemaPath = base_path() . '/schemas/';
+
+                if ( !file_exists( $schemaPath ) ) {
+                    File::makeDirectory( $schemaPath );
+
+                }
+
+                $filePath = $schemaPath.$tableName.'.json';
+
+                file_put_contents( $filePath, json_encode( $table ) );
+            }
+        } else {
+            $table = [];
+
+            $table[ 'tableName' ] =  $schema;
             $table[ 'migration' ] = true;
             $table[ 'seeder' ] = true;
             $table[ 'seederNumRows' ] = 10;
@@ -84,15 +209,14 @@ class CloneCommand extends Command {
             $table[ 'views' ] = true;
 
             $table[ 'columns' ] = [];
-            $field = [];
 
             // Get the columns for each table
-            $columns = DB::select( "DESCRIBE {$table[ 'tableName' ]}" );
+            $columns = DB::select( "DESCRIBE {$schema}" );
 
             foreach ( $columns as $column ) {
                 $columnName = $column->Field;
 
-                if (in_array( $columnName, [ 'id', 'created_at', 'updated_at' ] ) ) {
+                if ( in_array( $columnName, [ 'id', 'created_at', 'updated_at' ] ) ) {
                     continue;
                 }
 
@@ -136,7 +260,7 @@ class CloneCommand extends Command {
                                     }
                                     , $enumValues );
 
-                                    $field[ 'values' ] = $enumValues;
+                                    $field[ 'enum_values' ] = $enumValues;
                                 }
                             }
                         } catch ( \Throwable $th ) {
@@ -148,7 +272,7 @@ class CloneCommand extends Command {
                 }
 
                 $field[ 'nullable' ] = $column->Null == 'YES' ? true : false;
-                ;
+            
                 $field[ 'unique' ]  = $column->Key === 'UNI' ? true : false;
                 $field[ 'defaultValue' ] = $column->Default ?? '';
 
@@ -167,32 +291,35 @@ class CloneCommand extends Command {
                 $relatedColumn = '';
                 if ( $field[ 'hasRelation' ] ) {
                     $constraintInfo = DB::select( "
-                            SELECT
-                                TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
-                            FROM
-                                information_schema.KEY_COLUMN_USAGE
-                            WHERE
-                                TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName'
-                        " );
+                                SELECT
+                                    TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
+                                FROM
+                                    information_schema.KEY_COLUMN_USAGE
+                                WHERE
+                                    TABLE_NAME = '{$table[ 'tableName' ]}' AND COLUMN_NAME = '$columnName'
+                            " );
                     if ( !empty( $constraintInfo ) ) {
-                        $column[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME;
-                        $column[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME;
+                        $field[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME ?? '';
+                        $field[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME ?? '';
                     }
                 }
                 $table[ 'columns' ][] = $field;
+                $field=[];
 
             }
 
-            $crudPath = base_path() . '/schemas/';
+            $schemaPath = base_path() . '/schemas/';
 
-            if ( !file_exists( $crudPath ) ) {
-                File::makeDirectory( $crudPath );
+            if ( !file_exists( $schemaPath ) ) {
+                File::makeDirectory( $schemaPath );
 
             }
 
-            $filePath = $crudPath.$tableName.'.json';
+            $filePath = $schemaPath.$table[ 'tableName' ].'.json';
 
             file_put_contents( $filePath, json_encode( $table ) );
+
         }
+
     }
 }
