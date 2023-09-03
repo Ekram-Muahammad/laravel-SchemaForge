@@ -1,7 +1,6 @@
 public function find($id)
 {
-    $record = {{ModelName}}::findOrFail($id); // Adjust the model name
-
+    $record = {{ModelName}}::findOrFail($id); 
 
     return response()->json([
         'status' => 'success',

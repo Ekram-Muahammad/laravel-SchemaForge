@@ -92,12 +92,12 @@ class ResoureController {
         $validationLogic = '';
         foreach ( $validationRules as $field => $rules ) {
             $rulesString = implode( '|', $rules );
-            $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
+            $validationLogic .= PHP_EOL."    '{$field}' => '{$rulesString}',";
         }
 
         foreach ( $fields as $field ) {
             $fieldName = $field[ 'fieldName' ];
-            $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
+            $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},".PHP_EOL;
         }
 
         $storeStub = file_get_contents( __DIR__ . '/stubs/methods/resources/store.stub' );
@@ -133,12 +133,12 @@ class ResoureController {
         $validationLogic = '';
         foreach ( $validationRules as $field => $rules ) {
             $rulesString = implode( '|', $rules );
-            $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
+            $validationLogic .= PHP_EOL."    '{$field}' => '{$rulesString}',";
         }
 
         foreach ( $fields as $field ) {
             $fieldName = $field[ 'fieldName' ];
-            $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
+            $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},".PHP_EOL;
         }
 
         $updateStub = file_get_contents( __DIR__ . '/stubs/methods/resources/update.stub' );
@@ -160,7 +160,7 @@ class ResoureController {
 
         $routeontent = file_get_contents( base_path( 'routes/web.php' ) );
 
-        $importStatement = "<?php \n use App\Http\Controllers\\$controllerName; \n";
+        $importStatement = "<?php ".PHP_EOL." use App\Http\Controllers\\$controllerName; ".PHP_EOL;
         $routeApiContent = str_replace( [ '<?php' ], [ $importStatement ], $routeontent );
         file_put_contents( $routesFilePath, $routeApiContent );
 

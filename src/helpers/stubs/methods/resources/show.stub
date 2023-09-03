@@ -1,5 +1,5 @@
 public function show($id)
 {
-    $record = {{ModelName}}::findOrFail($id); // Adjust the model name
+    $record = {{ModelName}}::findOrFail($id); 
     return view('pages.{{tableName}}.show', compact('record'));
 }

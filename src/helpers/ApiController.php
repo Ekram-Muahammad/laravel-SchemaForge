@@ -82,12 +82,12 @@ class ApiController {
         $validationLogic = '';
         foreach ( $validationRules as $field => $rules ) {
             $rulesString = implode( '|', $rules );
-            $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
+            $validationLogic .= PHP_EOL."    '{$field}' => '{$rulesString}',";
         }
 
         foreach ( $fields as $field ) {
             $fieldName = $field[ 'fieldName' ];
-            $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
+            $storeLogic .= "  '{$fieldName}' => \$request->{$fieldName},".PHP_EOL;
         }
 
         $storeStub = file_get_contents( __DIR__ . '/stubs/methods/api/store.stub' );
@@ -116,12 +116,12 @@ class ApiController {
         $validationLogic = '';
         foreach ( $validationRules as $field => $rules ) {
             $rulesString = implode( '|', $rules );
-            $validationLogic .= "\n    '{$field}' => '{$rulesString}',";
+            $validationLogic .= PHP_EOL."    '{$field}' => '{$rulesString}',";
         }
 
         foreach ( $fields as $field ) {
             $fieldName = $field[ 'fieldName' ];
-            $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},\n";
+            $updateLogic .= "  '{$fieldName}' => \$request->{$fieldName},".PHP_EOL;
         }
 
         $updateStub = file_get_contents( __DIR__ . '/stubs/methods/api/update.stub' );
@@ -143,7 +143,7 @@ class ApiController {
 
         $apiContent = file_get_contents( base_path( 'routes/api.php' ) );
 
-        $importStatement = "<?php \n use App\Http\Controllers\Api\\$controllerName; \n";
+        $importStatement = "<?php ".PHP_EOL." use App\Http\Controllers\Api\\$controllerName; ".PHP_EOL;
 
         $routeApiContent = str_replace( [ '<?php' ], [ $importStatement ], $apiContent );
 

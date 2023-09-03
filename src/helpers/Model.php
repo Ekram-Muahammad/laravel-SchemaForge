@@ -14,20 +14,20 @@ class Model {
 
         foreach ( $relationships as $relationship ) {
             if ( $relationship[ 'relationType' ] === 'morphTo' ) {
-                $relationFunction = PHP_EOL."    public function {$relationship['fieldName']}()\n    {\n";
-                $relationFunction .= "        return \$this->{$relationship['relationType']}();\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['fieldName']}()".PHP_EOL."    {".PHP_EOL;
+                $relationFunction .= "        return \$this->{$relationship['relationType']}();".PHP_EOL;
                 $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             } elseif ( $relationship[ 'relationType' ] === 'hasManyThrough' ) {
                 $intermediateModelName = Str::studly( $relationship[ 'intermediateModel' ] );
                 $targetModelName = Str::studly( $relationship[ 'targetModel' ] );
-                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()\n    {\n";
-                $relationFunction .= "        return \$this->{$relationship['relationType']}({$targetModelName}::class, {$intermediateModelName}::class);\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()".PHP_EOL."    {".PHP_EOL;
+                $relationFunction .= "        return \$this->{$relationship['relationType']}({$targetModelName}::class, {$intermediateModelName}::class);".PHP_EOL;
                 $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             } else {
-                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()\n    {\n";
-                $relationFunction .= "        return \$this->{$relationship['relationType']}({$relationship['relatedModelName']}::class, '{$relationship['fieldName']}');\n";
+                $relationFunction = PHP_EOL."    public function {$relationship['relationName']}()".PHP_EOL."    {".PHP_EOL;
+                $relationFunction .= "        return \$this->{$relationship['relationType']}({$relationship['relatedModelName']}::class, '{$relationship['fieldName']}');".PHP_EOL;
                 $relationFunction .= '    }'.PHP_EOL;
                 $relationFunctions .= $relationFunction;
             }

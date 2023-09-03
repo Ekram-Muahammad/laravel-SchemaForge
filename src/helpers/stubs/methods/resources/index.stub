@@ -1,5 +1,5 @@
 public function index()
 {
-    $records = {{ModelName}}::paginate(10); // Adjust the model name and pagination as needed
+    $records = {{ModelName}}::paginate(10); 
     return view('pages.{{tableName}}.index', compact('records'));
 }

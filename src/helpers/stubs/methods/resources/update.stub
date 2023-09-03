@@ -7,7 +7,7 @@ public function update(Request $request,{{ModelName}} ${{varName}})
 
     ${{varName}}->update([
         {{UpdateLogic}}
-    ]); // Adjust the model name
-
+    ]); 
+    
     return redirect()->route('{{tableName}}.index')->with('success', 'Record updated successfully.');
 }

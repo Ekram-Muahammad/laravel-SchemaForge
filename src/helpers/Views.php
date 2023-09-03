@@ -114,7 +114,7 @@ class Views {
     {
         $headers = '';
         foreach ($fields as $field) {
-            $headers .= "<h4>{{\$record->" . $field['fieldName'] . "}}</h4>\n     ";
+            $headers .= "<h4>{{\$record->" . $field['fieldName'] . "}}</h4>".PHP_EOL."     ";
         }
         return $headers;
     }
@@ -124,7 +124,7 @@ class Views {
     {
         $headers = '';
         foreach ($fields as $field) {
-            $headers .= "<th>{$field['fieldName']}</th>\n        ";
+            $headers .= "<th>{$field['fieldName']}</th>".PHP_EOL."        ";
         }
         return $headers;
     }
@@ -133,7 +133,7 @@ class Views {
     {
         $columns = '';
         foreach ($fields as $field) {
-            $columns .= "<td>{{ \$record->{$field['fieldName']} }}</td>\n                    ";
+            $columns .= "<td>{{ \$record->{$field['fieldName']} }}</td>".PHP_EOL."                    ";
         }
         return $columns;
     }

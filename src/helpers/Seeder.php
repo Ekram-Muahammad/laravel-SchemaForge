@@ -30,7 +30,7 @@ class Seeder {
                 // Add the seeder to the run() method in DatabaseSeeder
                 $modifiedSeederContent = preg_replace(
                     '/(public function run\(\)(?:\s*:\s*void)?\s*\{)/',
-                    "\$1\n        \$this->call({$seederClass}::class);\n        //",
+                    "\$1".PHP_EOL."        \$this->call({$seederClass}::class);".PHP_EOL."        //",
                     $databaseSeederContent,
                     1, // Limit to replace only the first occurrence
                 );

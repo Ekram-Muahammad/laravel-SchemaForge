@@ -7,7 +7,7 @@ public function store(Request $request)
 
     $record ={{ModelName}}::create([
         {{StoreLogic}}
-    ]); // Adjust the model name
+    ]); 
 
     return response()->json([
             'status' => 'success',

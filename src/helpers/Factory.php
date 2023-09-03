@@ -56,7 +56,7 @@ class Factory {
                 // Add HasFactory trait to the model
                 $updatedModelContent = str_replace( 'use Illuminate\Database\Eloquent\Model;', 'use Illuminate\Database\Eloquent\Model;'.PHP_EOL.'use Illuminate\Database\Eloquent\Factories\HasFactory;', $modelContent );
 
-                $updatedModelContent = preg_replace( '/(class [\w\s]+ extends Model\s*\{)/', "$1\n    use HasFactory;", $updatedModelContent );
+                $updatedModelContent = preg_replace( '/(class [\w\s]+ extends Model\s*\{)/', "$1".PHP_EOL."    use HasFactory;", $updatedModelContent );
 
                 file_put_contents( $modelFilePath, $updatedModelContent );
             } else {

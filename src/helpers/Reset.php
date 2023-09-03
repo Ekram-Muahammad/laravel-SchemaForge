@@ -27,7 +27,7 @@ class Reset {
 
         foreach ( $migrationFiles as $migrationFile ) {
             $migrationContents = file_get_contents( $migrationFile );
-            $migrationName=Str::studly($this->tableName);
+            $migrationName=$this->tableName;
             if ( strpos( $migrationContents, "Schema::create('$migrationName'" ) !== false ) {
                 File::delete( $migrationFile );
             }
