@@ -42,7 +42,7 @@ class ApiController {
             $stubContent = str_replace( "{{{$method}}}", $logic, $stubContent );
         }
 
-        $stubContent = str_replace( [ '{{ControllerName}}', '{{ModelName}}' ], [ $controllerName, $modelName ], $stubContent );
+        $stubContent = preg_replace( [ '/{{\s*ControllerName\s*}}/', '/{{\s*ModelName\s*}}/' ], [ $controllerName, $modelName ], $stubContent );
 
         return $stubContent;
     }
@@ -51,7 +51,7 @@ class ApiController {
 
         $findStub = file_get_contents( __DIR__ . '/stubs/methods/api/find.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $findStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $findStub );
 
     }
 
@@ -59,7 +59,7 @@ class ApiController {
 
         $findAllStub = file_get_contents( __DIR__ . '/stubs/methods/api/findAll.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $findAllStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $findAllStub );
 
     }
 
@@ -92,7 +92,7 @@ class ApiController {
 
         $storeStub = file_get_contents( __DIR__ . '/stubs/methods/api/store.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*StoreLogic\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*validationLogic\s*}}/' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
 
     }
 
@@ -126,7 +126,7 @@ class ApiController {
 
         $updateStub = file_get_contents( __DIR__ . '/stubs/methods/api/update.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*UpdateLogic\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*varName\s*}}/', '/{{\s*validationLogic\s*}}/' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
 
     }
 
@@ -134,7 +134,7 @@ class ApiController {
 
         $deleteStub = file_get_contents( __DIR__ . '/stubs/methods/api/delete.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}', '{{varName}}' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $deleteStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*varName\s*}}/' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $deleteStub );
 
     }
 
@@ -151,7 +151,7 @@ class ApiController {
 
         $apiRouteStub = file_get_contents( __DIR__ . '/stubs/routes/api.stub' );
 
-        $routeContent = str_replace( [ '{{controllerName}}', '{{tableName}}' ], [ $controllerName, $tableName ], $apiRouteStub );
+        $routeContent = preg_replace( [ '/{{\s*controllerName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $controllerName, $tableName ], $apiRouteStub );
 
         // Append the generated route content to api.php
         File::append( $routesFilePath, $routeContent );

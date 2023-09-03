@@ -52,7 +52,7 @@ class Migration {
 
         $migrationStubContent = file_get_contents( __DIR__ . '/stubs/migration.stub' );
 
-        $migrationContent = str_replace( [ '{{migrateName}}', '{{tableName}}', '{{fields}}' ], [ $tb,
+        $migrationContent = preg_replace( [ '/{{\s*migrateName\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*fields\s*}}/' ], [ $tb,
 
         Str::lower( $tableName ), $fieldsContent ], $migrationStubContent );
 

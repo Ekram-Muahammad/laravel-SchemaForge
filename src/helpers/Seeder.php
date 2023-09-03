@@ -46,7 +46,7 @@ class Seeder {
         $seederStub = file_get_contents( __DIR__ . '/stubs/seeder.stub' );
         $modelClassName = Str::studly( $tableName );
 
-        $seederContent = str_replace( [ '{{tableName}}', '{{modelClassName}}', '{{numRows}}' ], [ Str::studly( $tableName ), $modelClassName, $numRows ], $seederStub );
+        $seederContent = preg_replace( [ '/{{\s*tableName\s*}}/', '/{{\s*modelClassName\s*}}/', '/{{\s*numRows\s*}}/' ], [ Str::studly( $tableName ), $modelClassName, $numRows ], $seederStub );
 
         // Save the seeder content to a file
         $seederFileName = Str::studly( $tableName ) . 'Seeder';

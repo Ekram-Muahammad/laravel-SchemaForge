@@ -5,7 +5,7 @@ public function update(Request $request,{{ModelName}} ${{varName}})
         {{validationLogic}}
     ]);
 
-    ${{varName}}>update([
+    ${{varName}}->update([
         {{UpdateLogic}}
     ]); 
 

@@ -5,7 +5,10 @@
     "autoload": {
         "psr-4": {
             "Ekram\\SchemaForge\\": "src/"
-        }
+        },
+        "files": [
+            "src/Helpers/functions.php"
+        ]
     },
     "authors": [
         {

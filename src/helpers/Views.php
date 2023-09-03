@@ -20,9 +20,9 @@ class Views {
             $dashboardStub = file_get_contents( __DIR__ . '/stubs/layouts/dashboard.stub' );
 
             $menu = file_get_contents( __DIR__ . '/stubs/component/menu.stub' );
-            $menuContent = str_replace( [ '{{tableName}}' ], [ $tableName ], $menu );
+            $menuContent = preg_replace( [ '/{{\s*tableName\s*}}/' ], [ $tableName ], $menu );
 
-            $menuContent = str_replace( [ '{{sidebarItems}}' ], [ $menuContent ], $dashboardStub );
+            $menuContent = preg_replace( [ '/{{\s*sidebarItems\s*}}/' ], [ $menuContent ], $dashboardStub );
 
             file_put_contents( $dashboardPath, $menuContent );
         } else {
@@ -32,7 +32,7 @@ class Views {
             // Step 2: Modify the HTML Content
             $menu = file_get_contents( __DIR__ . '/stubs/component/menu.stub' );
 
-            $menuContent = str_replace( [ '{{tableName}}' ], [ $tableName ], $menu );
+            $menuContent = preg_replace( [ '/{{\s*tableName\s*}}/' ], [ $tableName ], $menu );
 
             $dom = new \DOMDocument();
 
@@ -75,7 +75,7 @@ class Views {
         $headers = $this->generateTableHeaders($fields);
         $records = $this->generateTableColumns($fields);
 
-        $indexContent = str_replace(['{{tableName}}', '{{headers}}', '{{records}}'], [$tableName, $headers, $records], $indexViewStub);
+        $indexContent = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*headers\s*}}/', '/{{\s*records\s*}}/'], [$tableName, $headers, $records], $indexViewStub);
 
         file_put_contents("{$viewsDirectory}/index.blade.php", $indexContent);
 
@@ -103,7 +103,7 @@ class Views {
 
         $data = $this->generateFieldShow($fields);
 
-        $showContent = str_replace(['{{tableName}}', '{{headers}}', '{{fields}}'], [$tableName, $headers, $data], $showViewStub);
+        $showContent = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*headers\s*}}/', '/{{\s*fields\s*}}/'], [$tableName, $headers, $data], $showViewStub);
 
         file_put_contents("{$viewsDirectory}/show.blade.php", $showContent);
 
@@ -146,11 +146,11 @@ class Views {
         }
 
         $createStub = file_get_contents(__DIR__ . '/stubs/views/create.stub');
-        $createView = str_replace(['{{tableName}}', '{{formFields}}'], [$tableName, $formFields], $createStub);
+        $createView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/'], [$tableName, $formFields], $createStub);
 
 
         $updateStub =file_get_contents(__DIR__ . '/stubs/views/edit.stub');
-        $updateView = str_replace(['{{tableName}}', '{{formFields}}', '{{varName}}'], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
+        $updateView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/', '/{{\s*varName\s*}}/'], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
 
 
         $viewsDirectory = resource_path("views/pages/{$tableName}");
@@ -195,7 +195,7 @@ class Views {
     {
 
         $dateStub = file_get_contents(__DIR__ . '/stubs/form/date.stub');
-        $dateField = str_replace(['{{fieldName}}'], [$field['fieldName']], $dateStub);
+        $dateField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $dateStub);
 
 
         return $dateField;
@@ -206,7 +206,7 @@ class Views {
     {
 
         $dateStub = file_get_contents(__DIR__ . '/stubs/form/dateTime.stub');
-        $dateField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $dateStub);
+        $dateField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $dateStub);
 
         return $dateField;
 
@@ -215,7 +215,7 @@ class Views {
     public function generateTextareaField($field)
     {
         $textStub = file_get_contents(__DIR__ . '/stubs/form/textArea.stub');
-        $textField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $textStub);
+        $textField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -223,7 +223,7 @@ class Views {
     public function generateNumberField($field)
     {
         $numberStub = file_get_contents(__DIR__ . '/stubs/form/number.stub');
-        $numberField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $numberStub);
+        $numberField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $numberStub);
 
         return $numberField;
     }
@@ -237,7 +237,7 @@ class Views {
             $options .= "<option value=\"$value\">$value</option>";
         }
         $enumStub = file_get_contents(__DIR__ . '/stubs/form/enum.stub');
-        $enumField = str_replace(['{{$fieldName}}', '{{options}}'], [$field['fieldName'], $options], $enumStub);
+        $enumField = preg_replace(['/{{\s*fieldName\s*}}/', '/{{\s*options\s*}}/'], [$field['fieldName'], $options], $enumStub);
 
         return $enumField;
 
@@ -249,7 +249,7 @@ class Views {
         $selectOptions = "$relatedModel::pluck('id')";
 
         $selectStub = file_get_contents(__DIR__ . '/stubs/form/select.stub');
-        $selectField = str_replace(['{{$fieldName}}', '{{selectOptions}}'], [$field['fieldName'], $selectOptions], $selectStub);
+        $selectField = preg_replace(['/{{\s*fieldName\s*}}/', '/{{\s*selectOptions\s*}}/'], [$field['fieldName'], $selectOptions], $selectStub);
 
         return $selectField;
 
@@ -258,7 +258,7 @@ class Views {
     public function generateTextField($field)
     {
         $textStub = file_get_contents(__DIR__ . '/stubs/form/text.stub');
-        $textField = str_replace(['{{$fieldName}}'], [$field['fieldName']], $textStub);
+        $textField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $textStub);
 
         return $textField;
     }
@@ -266,7 +266,7 @@ class Views {
     public function generateBooleanField($field)
     {
         $radioStub = file_get_contents(__DIR__ . '/stubs/form/radio.stub');
-        $radioField = str_replace(['{{$fieldName}}'], [$field['fieldName' ] ], $radioStub );
+        $radioField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName' ] ], $radioStub );
 
         return $radioField;                                                        
     }

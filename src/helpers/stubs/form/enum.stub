@@ -1,7 +1,7 @@
 <div class="form-group">
-    <label for="{{$fieldName}}">{{$fieldName}}</label>
-    <select class="form-control" id="{{$fieldName}}" name="{{$fieldName}}">
-        <option value="">Select {{$fieldName}}</option>
+    <label for="{{fieldName}}">{{fieldName}}</label>
+    <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">
+        <option value="">Select {{fieldName}}</option>
         {{options}}
     </select>
 </div>

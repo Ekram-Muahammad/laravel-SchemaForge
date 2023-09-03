@@ -37,7 +37,7 @@ class Model {
             'name' => $modelName,
         ] );
 
-        $modelContent = str_replace( [ '{{modelName}}', '{{tableName}}', '{{fillable}}', '{{relations}}' ], [ $modelName, Str::lower( $tableName ), $fillableFields, $relationFunctions ], $modelTemplate );
+        $modelContent = preg_replace( [ '/{{\s*modelName\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*fillable\s*}}/', '/{{\s*relations\s*}}/' ], [ $modelName, Str::lower( $tableName ), $fillableFields, $relationFunctions ], $modelTemplate );
 
         $modelPath = app_path() . '/Models/' . $modelName . '.php';
 

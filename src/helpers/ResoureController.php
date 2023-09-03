@@ -41,10 +41,10 @@ class ResoureController {
 
         // Replace placeholders with generated methods
         foreach ( $resourceMethods as $method => $logic ) {
-            $stubContent = str_replace( "{{{$method}Method}}", $logic, $stubContent );
+            $stubContent = preg_replace( "/{{\s*{$method}Method\s*}}/", $logic, $stubContent );
         }
 
-        $stubContent = str_replace( [ '{{ControllerName}}', '{{ModelName}}' ], [ $controllerName, $modelName ], $stubContent );
+        $stubContent = preg_replace( [ '/{{\s*ControllerName\s*}}/', '/{{\s*ModelName\s*}}/' ], [ $controllerName, $modelName ], $stubContent );
 
         return $stubContent;
     }
@@ -53,7 +53,7 @@ class ResoureController {
 
         $indexStub = file_get_contents( __DIR__ . '/stubs/methods/resources/index.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $indexStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $indexStub );
 
     }
 
@@ -61,7 +61,7 @@ class ResoureController {
 
         $showStub = file_get_contents( __DIR__ . '/stubs/methods/resources/show.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $showStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $showStub );
 
     }
 
@@ -69,7 +69,7 @@ class ResoureController {
 
         $createStub = file_get_contents( __DIR__ . '/stubs/methods/resources/create.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $createStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $createStub );
 
     }
 
@@ -102,7 +102,7 @@ class ResoureController {
 
         $storeStub = file_get_contents( __DIR__ . '/stubs/methods/resources/store.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{StoreLogic}}', '{{tableName}}', '{{validationLogic}}' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*StoreLogic\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*validationLogic\s*}}/' ], [ $modelName, $storeLogic, $tableName, $validationLogic ], $storeStub );
 
     }
 
@@ -110,7 +110,7 @@ class ResoureController {
 
         $editStub = file_get_contents( __DIR__ . '/stubs/methods/resources/edit.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}' ], [ $modelName, $tableName, ], $editStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $modelName, $tableName, ], $editStub );
 
     }
 
@@ -143,7 +143,7 @@ class ResoureController {
 
         $updateStub = file_get_contents( __DIR__ . '/stubs/methods/resources/update.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{UpdateLogic}}', '{{tableName}}', '{{varName}}', '{{validationLogic}}' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*UpdateLogic\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*varName\s*}}/', '/{{\s*validationLogic\s*}}/' ], [ $modelName, $updateLogic, $tableName, Str::singular( $tableName ), $validationLogic ], $updateStub );
 
     }
 
@@ -151,7 +151,7 @@ class ResoureController {
 
         $destroyStub = file_get_contents( __DIR__ . '/stubs/methods/resources/destroy.stub' );
 
-        return str_replace( [ '{{ModelName}}', '{{tableName}}', '{{varName}}' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $destroyStub );
+        return preg_replace( [ '/{{\s*ModelName\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*varName\s*}}/' ], [ $modelName, $tableName, Str::singular( $tableName ) ], $destroyStub );
 
     }
 
@@ -165,7 +165,7 @@ class ResoureController {
         file_put_contents( $routesFilePath, $routeApiContent );
 
         $resourceRouteStub = file_get_contents( __DIR__ . '/stubs/routes/web.stub' );
-        $routeContent = str_replace( [ '{{controllerName}}', '{{tableName}}' ], [ $controllerName, $tableName ], $resourceRouteStub );
+        $routeContent = preg_replace( [ '/{{\s*controllerName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $controllerName, $tableName ], $resourceRouteStub );
         File::append( $routesFilePath, $routeContent );
     }
 }
