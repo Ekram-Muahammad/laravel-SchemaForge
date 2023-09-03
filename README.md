@@ -36,6 +36,24 @@ You can install this package via Composer. Run the following command:
 composer require SchemaForgeServiceProvider
 ```
 
+Put following class in providers array of your config/app.php file:
+
+```php
+'providers' => 
+[ 
+   // ... 
+   Ekram\SchemaForge\SchemaForgeServiceProvider;, 
+];
+
+```
+
+Now run the following command to export files from vendor folder:
+
+
+```bash
+php artisan vendor:publish --provider="Ekram\SchemaForge\SchemaForgeServiceProvider"
+```
+
 
 ## How to Use
 
