@@ -1,4 +1,4 @@
-// API routes for {{controllerName}}
+
 Route::group(['prefix' => '{{tableName}}'], function () {
     Route::get('/findAll', [{{controllerName}}::class, 'findAll']);
     Route::get('/{id}', [{{controllerName}}::class, 'find']);

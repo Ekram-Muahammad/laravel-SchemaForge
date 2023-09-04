@@ -1,2 +1,1 @@
-// Resource routes for {{controllerName}}
 Route::resource('{{tableName}}', {{controllerName}}::class);
