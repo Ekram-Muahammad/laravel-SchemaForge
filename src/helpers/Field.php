@@ -20,13 +20,13 @@ class Field {
             $index = $column[ 'index' ];
 
             if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
-                $fieldProperties[ 'length' ] = $column[ 'length' ];
+                $fieldProperties[ 'length' ] = $column[ 'length' ] ?? 255;
             } elseif ( $fieldType === 'decimal' ) {
                 $fieldProperties[ 'precision' ] = $column[ 'length' ];
                 $fieldProperties[ 'scale' ] = $column[ 'precision' ];
             } elseif ( $fieldType === 'enum' ) {
-                $enumValues = $column[ 'enum_values' ];
-                $fieldProperties[ 'enumValues' ] = explode( ',', $enumValues );
+                $enumValues = is_array($column[ 'enum_values' ]) ? $column[ 'enum_values' ] : explode(",",$column[ 'enum_values' ]);
+                $fieldProperties[ 'enumValues' ] = $enumValues;
             }
 
             $hasRelation = false;
@@ -47,7 +47,7 @@ class Field {
 
             if ( $hasRelation && isset( $column[ 'relation' ] ) ) {
                 // generate model relations
-                $relationType = $column[ 'relation' ][ 'relationType' ];
+                $relationType = $column[ 'relation' ][ 'relationType' ] ?? "belongsTo";
 
                 $relatedTable = '';
                 $relatedColumn = '';

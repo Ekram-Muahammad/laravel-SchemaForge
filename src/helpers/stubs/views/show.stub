@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Item Details</h1>
+    <h1>{{tableName}} Details</h1>
 
     <div class="card">
         <div class="card-body">

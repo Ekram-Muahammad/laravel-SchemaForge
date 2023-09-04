@@ -106,7 +106,7 @@ class Views {
     {
         $headers = '';
         foreach ($fields as $field) {
-            $headers .= "<h4>{{\$record->" . $field['fieldName'] . "}}</h4>".PHP_EOL."     ";
+            $headers .= "<h4>{$field['fieldName']} : {{\$record->" . $field['fieldName'] . "}}</h4>".PHP_EOL."     ";
         }
         return $headers;
     }

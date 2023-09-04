@@ -178,8 +178,8 @@ class CloneCommand extends Command {
                                     TABLE_NAME = '$tableName' AND COLUMN_NAME = '$columnName'
                             " );
                         if ( !empty( $constraintInfo ) ) {
-                            $field[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME;
-                            $field[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME;
+                            $field['relation'][ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME;
+                            $field['relation'][ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME;
                         }
                     }
                     $table[ 'columns' ][] = $field;
@@ -299,8 +299,8 @@ class CloneCommand extends Command {
                                     TABLE_NAME = '{$table[ 'tableName' ]}' AND COLUMN_NAME = '$columnName'
                             " );
                     if ( !empty( $constraintInfo ) ) {
-                        $field[ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME ?? '';
-                        $field[ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME ?? '';
+                        $field['relation'][ 'relatedTable' ] = $constraintInfo[ 0 ]->REFERENCED_TABLE_NAME ?? '';
+                        $field['relation'][ 'relatedColumn' ] = $constraintInfo[ 0 ]->REFERENCED_COLUMN_NAME ?? '';
                     }
                 }
                 $table[ 'columns' ][] = $field;
