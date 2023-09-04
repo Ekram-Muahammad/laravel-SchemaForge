@@ -151,7 +151,7 @@ After executing the command, Laravel SchemaForge will generate several files and
 
 + additionally, it creates a separate controller for API resource methods. This controller is also placed inside the app/Http/Controllers/ directory. It provides methods for handling standard API CRUD operations like fetching, creating, updating, and deleting records.
 
-+ Blade view files for creating, reading, updating, and deleting records.
++ Blade view files for creating, reading, updating, and deleting records, inside the resources/views/{tableName} directory.
 
 + Seeder and Factory files for populating your database with sample data.
 
