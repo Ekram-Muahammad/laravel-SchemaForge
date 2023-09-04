@@ -20,6 +20,7 @@
 
 + **Automated Code Generation:** SchemaForge automates the generation of migration files, models, controllers, seeders, factories, and views for your CRUD operations based on your database schema.
 
++ **Automated User Interface Generation:** It generates CRUD (Create, Read, Edit) pages, automating the creation of user interfaces for displaying, editing, creating, and deleting data within your Laravel application.
 
 ## Benefits
 + **Efficiency:** Speed up your development workflow by seamlessly transitioning from schema design to code generation, data seeding, and schema cloning, all within a single package.
