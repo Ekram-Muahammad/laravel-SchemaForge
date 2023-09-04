@@ -13,17 +13,17 @@ class Field {
 
             $fieldProperties = [];
             $fieldName = $column[ 'name' ];
-            $fieldType = $column[ 'type' ];
-            $defaultValue = $column[ 'defaultValue' ];
-            $nullable = $column[ 'nullable' ];
-            $unique = $column[ 'unique' ];
-            $index = $column[ 'index' ];
+            $fieldType = $column[ 'type' ] ?? "string";
+            $defaultValue = $column[ 'defaultValue' ] ?? "";
+            $nullable = $column[ 'nullable' ] ?? false;
+            $unique = $column[ 'unique' ] ?? false;
+            $index = $column[ 'index' ] ?? "none";
 
             if ( in_array( $fieldType, [ 'string', 'char', 'text' ] ) ) {
                 $fieldProperties[ 'length' ] = $column[ 'length' ] ?? 255;
             } elseif ( $fieldType === 'decimal' ) {
-                $fieldProperties[ 'precision' ] = $column[ 'length' ];
-                $fieldProperties[ 'scale' ] = $column[ 'precision' ];
+                $fieldProperties[ 'precision' ] = $column[ 'length' ] ?? 8;
+                $fieldProperties[ 'scale' ] = $column[ 'precision' ] ?? 2;
             } elseif ( $fieldType === 'enum' ) {
                 $enumValues = is_array($column[ 'enum_values' ]) ? $column[ 'enum_values' ] : explode(",",$column[ 'enum_values' ]);
                 $fieldProperties[ 'enumValues' ] = $enumValues;
@@ -55,12 +55,12 @@ class Field {
                 if ( $relationType == 'morphTo' ) {
                     $relatedModelName = $fieldName;
                 } elseif ( $relationType == 'hasManyThrough' ) {
-                    $intermediateModel = $column[ 'relation' ][ 'intermediateModel' ];
-                    $targetModel = $column[ 'relation' ][ 'targetModel' ];
+                    $intermediateModel = $column[ 'relation' ][ 'intermediateModel' ] ?? "";
+                    $targetModel = $column[ 'relation' ][ 'targetModel' ] ?? "";
                     $relatedModelName = $fieldName;
                 } else {
-                    $relatedTable = $column[ 'relation' ] [ 'relatedTable' ];
-                    $relatedColumn = $column[ 'relation' ][ 'relatedColumn' ];
+                    $relatedTable = $column[ 'relation' ][ 'relatedTable' ] ?? "";
+                    $relatedColumn = $column[ 'relation' ][ 'relatedColumn' ] ?? "";
                     // Generate related model name
                     $relatedModelName = Str::studly( Str::ucfirst( $relatedTable ) );
                 }

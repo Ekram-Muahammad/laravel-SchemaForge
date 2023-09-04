@@ -71,7 +71,7 @@ class CrudCommand extends Command
 
                 if (!empty($fields)) {
 
-                    if ($jsonData['migration']) {
+                    if ($jsonData['migration']==true) {
                         $migrationController = new Migration();
                         $migrationController->generateMigrationContent($tableName, $fields);
                     }
