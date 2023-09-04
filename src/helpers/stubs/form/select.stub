@@ -4,7 +4,7 @@
     <select class="form-control" id="{{fieldName}}" name="{{fieldName}}">
         <option value="">Select {{fieldName}}</option>
         @foreach ($options as $key => $value)
-            <option value="{{$key}}">{{$value}}</option>
+            <option value="{{$value}}" {{choosedOption}} >{{$value}}</option>
         @endforeach
     </select>
 </div>

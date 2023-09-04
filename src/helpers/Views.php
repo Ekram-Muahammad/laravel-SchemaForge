@@ -80,22 +80,14 @@ class Views {
         file_put_contents("{$viewsDirectory}/index.blade.php", $indexContent);
 
         // Generate the create.blade.php file
-        $createView = <<<EOT
-        <!-- contents of create.blade.php -->
-        EOT;
-        file_put_contents("{$viewsDirectory}/create.blade.php", $createView);
+        file_put_contents("{$viewsDirectory}/create.blade.php", "");
 
         // Generate the edit.blade.php file
-        $editView = <<<EOT
-        <!-- contents of edit.blade.php -->
-        EOT;
-        file_put_contents("{$viewsDirectory}/edit.blade.php", $editView);
+      
+        file_put_contents("{$viewsDirectory}/edit.blade.php", "");
 
         // Generate the show.blade.php file
-        $showView = <<<EOT
-        <!-- contents of show.blade.php -->
-        EOT;
-        file_put_contents("{$viewsDirectory}/show.blade.php", $showView);
+        file_put_contents("{$viewsDirectory}/show.blade.php", "");
 
 
 
@@ -140,17 +132,21 @@ class Views {
 
     public function generateFormFields($fields, $tableName)
     {
-        $formFields = '';
+        $createFormFields = '';
         foreach ($fields as $field) {
-            $formFields .= $this->generateFormField($field);
+            $createFormFields .= $this->generateFormField($field,'create');
         }
 
         $createStub = file_get_contents(__DIR__ . '/stubs/views/create.stub');
-        $createView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/'], [$tableName, $formFields], $createStub);
+        $createView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/'], [$tableName, $createFormFields], $createStub);
 
+        $updateFormFields = '';
+        foreach ($fields as $field) {
+            $updateFormFields .= $this->generateFormField($field,'update');
+        }
 
         $updateStub =file_get_contents(__DIR__ . '/stubs/views/edit.stub');
-        $updateView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/', '/{{\s*varName\s*}}/'], [$tableName, $formFields, Str::singular($tableName)], $updateStub);
+        $updateView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/', '/{{\s*varName\s*}}/'], [$tableName, $updateFormFields, Str::singular($tableName)], $updateStub);
 
 
         $viewsDirectory = resource_path("views/pages/{$tableName}");
@@ -158,72 +154,72 @@ class Views {
         file_put_contents("{$viewsDirectory}/edit.blade.php", $updateView);
     }
 
-    public function generateFormField($field)
+    public function generateFormField($field,$action)
     {
 
         $foreignFieldTypes = ['foreign', 'foreignId', 'unsignedBigInteger', 'foreignUuid', 'foreignUuidNullable'];
 
         if (in_array($field['fieldType'], $foreignFieldTypes)) {
-            return $this->generateSelectField($field);
+            return $this->generateSelectField($field,$action);
         } else {
             switch ($field['fieldType']) {
                 case 'date':
-                    return $this->generateDateField($field);
+                    return $this->generateDateField($field,$action);
                 case 'datetime':
-                    return $this->generateDatetimeField($field);
+                    return $this->generateDatetimeField($field,$action);
                 case 'text':
                 case 'longtext':
-                    return $this->generateTextareaField($field);
+                    return $this->generateTextareaField($field,$action);
                 case 'integer':
                 case 'bigint':
                 case 'smallint':
                 case 'float':
                 case 'double':
-                    return $this->generateNumberField($field);
+                    return $this->generateNumberField($field,$action);
                 case 'enum':
                     return $this->generateEnumField($field);
                 case 'boolean':
-                    return $this->generateBooleanField($field);
+                    return $this->generateBooleanField($field,$action);
                 default:
-                    return $this->generateTextField($field);
+                    return $this->generateTextField($field,$action);
             }
         }
 
     }
 
-    public function generateDateField($field)
+    public function generateDateField($field,$action)
     {
 
         $dateStub = file_get_contents(__DIR__ . '/stubs/form/date.stub');
-        $dateField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $dateStub);
+        $dateField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName'],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}"], $dateStub);
 
 
         return $dateField;
 
     }
 
-    public function generateDatetimeField($field)
+    public function generateDatetimeField($field,$action)
     {
 
         $dateStub = file_get_contents(__DIR__ . '/stubs/form/dateTime.stub');
-        $dateField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $dateStub);
+        $dateField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName'],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}"], $dateStub);
 
         return $dateField;
 
     }
 
-    public function generateTextareaField($field)
+    public function generateTextareaField($field,$action)
     {
         $textStub = file_get_contents(__DIR__ . '/stubs/form/textArea.stub');
-        $textField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $textStub);
+        $textField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName'],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}"], $textStub);
 
         return $textField;
     }
 
-    public function generateNumberField($field)
+    public function generateNumberField($field,$action)
     {
         $numberStub = file_get_contents(__DIR__ . '/stubs/form/number.stub');
-        $numberField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $numberStub);
+        $numberField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName'],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}"], $numberStub);
 
         return $numberField;
     }
@@ -243,30 +239,30 @@ class Views {
 
     }
 
-    public function generateSelectField($field)
+    public function generateSelectField($field,$action)
     {
         $relatedModel = '\\App\\Models\\' . Str::studly(Str::ucfirst($field['relatedTable']));
         $selectOptions = "$relatedModel::pluck('id')";
 
         $selectStub = file_get_contents(__DIR__ . '/stubs/form/select.stub');
-        $selectField = preg_replace(['/{{\s*fieldName\s*}}/', '/{{\s*selectOptions\s*}}/'], [$field['fieldName'], $selectOptions], $selectStub);
+        $selectField = preg_replace(['/{{\s*fieldName\s*}}/', '/{{\s*selectOptions\s*}}/',"/{{\s*choosedOption\s*}}/"], [$field['fieldName'], $selectOptions,$action=='create' ? "" : "{{\$value==\$record->{$field['fieldName']} ? 'selected' : ''}}"], $selectStub);
 
         return $selectField;
 
     }
 
-    public function generateTextField($field)
+    public function generateTextField($field,$action)
     {
         $textStub = file_get_contents(__DIR__ . '/stubs/form/text.stub');
-        $textField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName']], $textStub);
+        $textField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName'],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}"], $textStub);
 
         return $textField;
     }
 
-    public function generateBooleanField($field)
+    public function generateBooleanField($field,$action)
     {
         $radioStub = file_get_contents(__DIR__ . '/stubs/form/radio.stub');
-        $radioField = preg_replace(['/{{\s*fieldName\s*}}/'], [$field['fieldName' ] ], $radioStub );
+        $radioField = preg_replace(['/{{\s*fieldName\s*}}/','/{{\s*fieldValue\s*}}/'], [$field['fieldName' ],$action=='create' ? "old('{$field['fieldName']}')" : "\$record->{$field['fieldName']}" ], $radioStub );
 
         return $radioField;                                                        
     }

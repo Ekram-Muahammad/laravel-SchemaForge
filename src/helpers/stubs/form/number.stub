@@ -1,4 +1,4 @@
 <div class="form-group">
     <label for="{{fieldName}}">{{fieldName}}</label>
-    <input type="number" class="form-control" id="{{fieldName}}" name="{{fieldName}}" value="{{ old('{{fieldName}}') }}">
+    <input type="number" class="form-control" id="{{fieldName}}" name="{{fieldName}}" value="{{fieldValue}}">
 </div>

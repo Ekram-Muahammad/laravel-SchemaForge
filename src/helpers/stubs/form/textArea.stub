@@ -1,4 +1,4 @@
 <div class="form-group">
     <label for="{{fieldName}}">{{fieldName}}</label>
-    <textarea class="form-control" id="{{fieldName}}" name="{{fieldName}}" rows="5">{{ old('{{fieldName}}') }}</textarea>
+    <textarea class="form-control" id="{{fieldName}}" name="{{fieldName}}" rows="5">{{ {{fieldValue}} }}</textarea>
 </div>

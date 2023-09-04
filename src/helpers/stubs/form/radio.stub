@@ -1,11 +1,11 @@
 <div class="form-group">
     <label>{{fieldName}}</label>
     <div class="form-check">
-        <input type="radio" class="form-check-input" name="{{fieldName}}" id="{{fieldName}}_yes" value="1" {{ old('{{fieldName}}') == 1 ? 'checked' : '' }}>
+        <input type="radio" class="form-check-input" name="{{fieldName}}" id="{{fieldName}}_yes" value="1" {{ {{fieldValue}} == 1 ? 'checked' : '' }}>
         <label class="form-check-label" for="{{fieldName}}_yes">Yes</label>
     </div>
     <div class="form-check">
-        <input type="radio" class="form-check-input" name="{{fieldName}}" id="{{fieldName}}_no" value="0" {{ old('{{fieldName}}') == 0 ? 'checked' : '' }}>
+        <input type="radio" class="form-check-input" name="{{fieldName}}" id="{{fieldName}}_no" value="0" {{ {{fieldValue}} == 0 ? 'checked' : '' }}>
         <label class="form-check-label" for="{{fieldName}}_no">No</label>
     </div>
 </div>
