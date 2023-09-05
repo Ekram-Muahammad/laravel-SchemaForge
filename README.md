@@ -77,6 +77,7 @@ The `php artisan make:crud` command is a powerful tool provided by Laravel Schem
     "resourceController": true,          // Set to true if you want to create a resource controller.
     "apiController": true,               // Set to true if you want to create an API controller.
     "views": true,                       // Set to true if you want to generate views for this table.
+    "postman":true,                       // Set to true if you want to generate a postman collection for testing your API endpoints.
     "columns": [
         {
             "name": "name",              // Column name for the user's name.   
@@ -160,6 +161,8 @@ After executing the command, Laravel SchemaForge will generate several files and
 + Laravel SchemaForge automatically configures the routes for your API in the routes/api.php file. It defines the necessary routes to access the API endpoints.
 
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
+
++ Postman Collection Generation: SchemaForge enhances your API development workflow by generating a Postman collection with the table name. You can find this collection inside the schema/postman directory. Simply import this collection into Postman, and it provides a convenient way to test your API endpoints, ensuring they function correctly and reliably.
 
 + After successfully running the Laravel project, kindly proceed to access the following URL: domain/{tableName}. This URL will enable you to view the project's output or results.
 
