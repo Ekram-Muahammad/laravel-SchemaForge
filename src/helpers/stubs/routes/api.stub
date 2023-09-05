@@ -3,6 +3,6 @@ Route::group(['prefix' => '{{tableName}}'], function () {
     Route::get('/findAll', [{{controllerName}}::class, 'findAll']);
     Route::get('/{id}', [{{controllerName}}::class, 'find']);
     Route::post('/', [{{controllerName}}::class, 'store']);
-    Route::put('/{id}', [{{controllerName}}::class, 'update']);
-    Route::delete('/{id}', [{{controllerName}}::class, 'delete']);
+    Route::put('/{{{varName}}}', [{{controllerName}}::class, 'update']);
+    Route::delete('/{{{varName}}}', [{{controllerName}}::class, 'delete']);
 });

@@ -1,0 +1,8 @@
+{
+        "name": "find {{tableName}}",
+        "request": {
+            "url": "{{baseUrl}}/api/{{tableName}}/1",
+            "method": "GET"
+        },
+        "response": []
+}

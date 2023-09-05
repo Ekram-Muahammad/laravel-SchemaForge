@@ -4,6 +4,7 @@ namespace Ekram\SchemaForge\Commands;
 
 use Ekram\SchemaForge\Helpers\ApiController;
 use Ekram\SchemaForge\Helpers\Factory;
+use Ekram\SchemaForge\Helpers\Postman;
 use Ekram\SchemaForge\Helpers\ResoureController;
 use Ekram\SchemaForge\Helpers\Seeder;
 use Ekram\SchemaForge\Helpers\Views;
@@ -117,6 +118,12 @@ class CrudCommand extends Command
                     if ($createApiController) {
                         $apiController = new ApiController();
                         $apiController->generateApiController($tableName, $fields, $modelName);
+                    }
+
+                    $createPostman= $jsonData['postman'] ?? false;
+                    if($createPostman) {
+                        $postmanController=new Postman();
+                        $postmanController->generateCollection($tableName,$fields);
                     }
 
 

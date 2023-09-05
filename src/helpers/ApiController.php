@@ -151,7 +151,7 @@ class ApiController {
 
         $apiRouteStub = file_get_contents( __DIR__ . '/stubs/routes/api.stub' );
 
-        $routeContent = preg_replace( [ '/{{\s*controllerName\s*}}/', '/{{\s*tableName\s*}}/' ], [ $controllerName, $tableName ], $apiRouteStub );
+        $routeContent = preg_replace( [ '/{{\s*controllerName\s*}}/', '/{{\s*tableName\s*}}/', '/{{\s*varName\s*}}/' ], [ $controllerName, $tableName,Str::singular($tableName) ], $apiRouteStub );
 
         // Append the generated route content to api.php
         File::append( $routesFilePath, $routeContent );

@@ -1,0 +1,8 @@
+{
+        "name": "show {{tableName}} records",
+        "request": {
+            "url": "{{baseUrl}}/api/{{tableName}}/findAll?page=1",
+            "method": "GET"
+        },
+        "response": []
+}

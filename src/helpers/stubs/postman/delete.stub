@@ -1,0 +1,8 @@
+    {
+        "name": "Delete {{tableName}}",
+        "request": {
+            "url": "{{baseUrl}}/api/{{tableName}}/1",
+            "method": "DELETE"
+        },
+        "response": []
+    }

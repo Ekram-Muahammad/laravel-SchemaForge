@@ -6,10 +6,12 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-class Reset {
+class Reset
+{
     protected $tableName;
 
-    function __construct( $tableName ) {
+    function __construct($tableName)
+    {
         $this->tableName = $tableName;
         $this->deleteMigration();
         $this->deleteTable();
@@ -18,100 +20,117 @@ class Reset {
         $this->deleteSeeder();
         $this->deleteFactory();
         $this->deleteController();
+        $this->deletePostman();
         $this->deleteRoutes();
         $this->deleteSidebarLink();
     }
 
-    public function deleteMigration() {
-        $migrationFiles = File::glob( database_path( 'migrations/*.php' ) );
+    public function deleteMigration()
+    {
+        $migrationFiles = File::glob(database_path('migrations/*.php'));
 
-        foreach ( $migrationFiles as $migrationFile ) {
-            $migrationContents = file_get_contents( $migrationFile );
-            $migrationName=$this->tableName;
-            if ( strpos( $migrationContents, "Schema::create('$migrationName'" ) !== false ) {
-                File::delete( $migrationFile );
+        foreach ($migrationFiles as $migrationFile) {
+            $migrationContents = file_get_contents($migrationFile);
+            $migrationName = $this->tableName;
+            if (strpos($migrationContents, "Schema::create('$migrationName'") !== false) {
+                File::delete($migrationFile);
             }
         }
     }
 
-    public function deleteTable() {
-        if ( Schema::hasTable( $this->tableName ) ) {
-            Schema::dropIfExists( $this->tableName );
+    public function deleteTable()
+    {
+        if (Schema::hasTable($this->tableName)) {
+            Schema::dropIfExists($this->tableName);
         }
     }
 
-    public function deleteModel() {
-        $modelPath = app_path( 'Models/' . Str::ucfirst( $this->tableName ) . '.php' );
-        if ( File::exists( $modelPath ) ) {
-            File::delete( $modelPath );
+    public function deleteModel()
+    {
+        $modelPath = app_path('Models/' . Str::ucfirst($this->tableName) . '.php');
+        if (File::exists($modelPath)) {
+            File::delete($modelPath);
         }
     }
 
-    public function deleteViews() {
-        $viewsPath = resource_path( 'views/pages/' .$this->tableName );
-        if ( file_exists( $viewsPath ) ) {
-            File::deleteDirectory( $viewsPath );
+    public function deleteViews()
+    {
+        $viewsPath = resource_path('views/pages/' . $this->tableName);
+        if (file_exists($viewsPath)) {
+            File::deleteDirectory($viewsPath);
         }
     }
 
-    public function deleteSeeder() {
-        $modelClassName = Str::ucfirst( $this->tableName );
+    public function deleteSeeder()
+    {
+        $modelClassName = Str::ucfirst($this->tableName);
         $seederClassName = "{$modelClassName}Seeder";
-        $seederFilePath = database_path( "seeders/{$seederClassName}.php" );
-        if ( file_exists( $seederFilePath ) ) {
-            File::delete( $seederFilePath );
+        $seederFilePath = database_path("seeders/{$seederClassName}.php");
+        if (file_exists($seederFilePath)) {
+            File::delete($seederFilePath);
 
             // Update DatabaseSeeder
-            $databaseSeederPath = database_path( 'seeders/DatabaseSeeder.php' );
-            $databaseSeederContent = file_get_contents( $databaseSeederPath );
-            $newContent = str_replace( "\$this->call({$seederClassName}::class);", '', $databaseSeederContent );
-            file_put_contents( $databaseSeederPath, $newContent );
+            $databaseSeederPath = database_path('seeders/DatabaseSeeder.php');
+            $databaseSeederContent = file_get_contents($databaseSeederPath);
+            $newContent = str_replace("\$this->call({$seederClassName}::class);", '', $databaseSeederContent);
+            file_put_contents($databaseSeederPath, $newContent);
         }
     }
 
-    public function deleteFactory() {
+    public function deleteFactory()
+    {
 
-        $modelClassName = Str::ucfirst( $this->tableName );
+        $modelClassName = Str::ucfirst($this->tableName);
         $factoryClassName = "{$modelClassName}Factory";
 
-        $factoryFilePath = database_path( "factories/{$factoryClassName}.php" );
-        if ( file_exists( $factoryFilePath ) ) {
-            File::delete( $factoryFilePath );
+        $factoryFilePath = database_path("factories/{$factoryClassName}.php");
+        if (file_exists($factoryFilePath)) {
+            File::delete($factoryFilePath);
         }
     }
 
-    public function deleteController() {
-        $controllerClassName = ucfirst( Str::camel( Str::singular( $this->tableName ) ) ) . 'Controller';
-        $controllerFilePath = app_path( "Http/Controllers/{$controllerClassName}.php" );
-        if ( file_exists( $controllerFilePath ) ) {
-            File::delete( $controllerFilePath );
+    public function deleteController()
+    {
+        $controllerClassName = ucfirst(Str::camel(Str::singular($this->tableName))) . 'Controller';
+        $controllerFilePath = app_path("Http/Controllers/{$controllerClassName}.php");
+        if (file_exists($controllerFilePath)) {
+            File::delete($controllerFilePath);
         }
-        $apiControllerFilePath = app_path( "Http/Controllers/Api/{$controllerClassName}.php" );
-        if ( file_exists( $apiControllerFilePath ) ) {
-            File::delete( $apiControllerFilePath );
+        $apiControllerFilePath = app_path("Http/Controllers/Api/{$controllerClassName}.php");
+        if (file_exists($apiControllerFilePath)) {
+            File::delete($apiControllerFilePath);
         }
     }
 
-    public function deleteRoutes() {
-        $apiRouteFile =  base_path( 'routes/api.php' );
-        $webRouteFile = base_path( 'routes/web.php' );
+    public function deletePostman()
+    {
+        $postmanFilePath = base_path("schemas/postman/{$this->tableName}.json");
+        if (file_exists($postmanFilePath)) {
+            File::delete($postmanFilePath);
+        }
+    }
+
+    public function deleteRoutes()
+    {
+        $apiRouteFile = base_path('routes/api.php');
+        $webRouteFile = base_path('routes/web.php');
 
         $routePrefix = $this->tableName;
 
         // delete api routes
 
-        $controllerClassName = ucfirst( Str::camel( Str::singular( $this->tableName ) ) ) . 'Controller';
+        $controllerClassName = ucfirst(Str::camel(Str::singular($this->tableName))) . 'Controller';
 
-        $apiFileContents = file_get_contents( $apiRouteFile );
+        $apiFileContents = file_get_contents($apiRouteFile);
 
-        $startPosition = strpos( $apiFileContents, "Route::group(['prefix' => '{$routePrefix}']" );
+        $startPosition = strpos($apiFileContents, "Route::group(['prefix' => '{$routePrefix}']");
 
-        $endPosition = strpos( $apiFileContents, '});', $startPosition ) + 3;
+        $endPosition = strpos($apiFileContents, '});', $startPosition) + 3;
 
-        if ( $startPosition !== false && $endPosition !== false ) {
-            $newContents = substr_replace( $apiFileContents, '', $startPosition, $endPosition - $startPosition );
+        if ($startPosition !== false && $endPosition !== false) {
+            $newContents = substr_replace($apiFileContents, '', $startPosition, $endPosition - $startPosition);
 
-            file_put_contents( $apiRouteFile, $newContents );
+            file_put_contents($apiRouteFile, $newContents);
 
             $importStatement = "use App\\Http\\Controllers\\Api\\{$controllerClassName};";
 
@@ -127,22 +146,22 @@ class Reset {
 
         // delete web routes
 
-        $webFileContents = file_get_contents( $webRouteFile );
+        $webFileContents = file_get_contents($webRouteFile);
 
         $importStatement = "use App\\Http\\Controllers\\$controllerClassName;";
 
-        $startPosition = strpos( $webFileContents, "Route::resource('{$routePrefix}'" );
+        $startPosition = strpos($webFileContents, "Route::resource('{$routePrefix}'");
 
-        $endPosition = strpos( $webFileContents, '::class);', $startPosition ) + 9;
+        $endPosition = strpos($webFileContents, '::class);', $startPosition) + 9;
 
-        if ( $startPosition !== false && $endPosition !== false ) {
+        if ($startPosition !== false && $endPosition !== false) {
             // Remove the route group from the routes file
-            $newContent = substr_replace( $webFileContents, '', $startPosition, $endPosition - $startPosition );
+            $newContent = substr_replace($webFileContents, '', $startPosition, $endPosition - $startPosition);
 
-            $newContents = str_replace( $importStatement, '', $newContent );
+            $newContents = str_replace($importStatement, '', $newContent);
 
             // Save the updated contents back to the routes file
-            file_put_contents( $webRouteFile, $newContent );
+            file_put_contents($webRouteFile, $newContent);
 
             $importStatement = "use App\\Http\\Controllers\\{$controllerClassName};";
 
@@ -158,23 +177,24 @@ class Reset {
 
     }
 
-    public function deleteSidebarLink() {
-        $dashboardPath = resource_path( 'views/layouts/dashboard.blade.php' );
+    public function deleteSidebarLink()
+    {
+        $dashboardPath = resource_path('views/layouts/dashboard.blade.php');
 
-        if ( file_exists( $dashboardPath ) ) {
+        if (file_exists($dashboardPath)) {
 
-            $dashboardContent = file_get_contents( $dashboardPath );
+            $dashboardContent = file_get_contents($dashboardPath);
 
             $dom = new \DOMDocument();
-            $dom->loadHTML( $dashboardContent, LIBXML_NOERROR );
+            $dom->loadHTML($dashboardContent, LIBXML_NOERROR);
 
-            $liElements = $dom->getElementsByTagName( 'li' );
+            $liElements = $dom->getElementsByTagName('li');
 
-            foreach ( $liElements as $liElement ) {
-                $pElements = $liElement->getElementsByTagName( 'p' );
-                foreach ( $pElements as $pElement ) {
-                    if ( trim( $pElement->textContent ) === $this->tableName ) {
-                        $liElement->parentNode->removeChild( $liElement );
+            foreach ($liElements as $liElement) {
+                $pElements = $liElement->getElementsByTagName('p');
+                foreach ($pElements as $pElement) {
+                    if (trim($pElement->textContent) === $this->tableName) {
+                        $liElement->parentNode->removeChild($liElement);
                         break;
                         // Stop further processing if the element is removed
                     }
@@ -183,7 +203,7 @@ class Reset {
 
             $updatedContent = $dom->saveHTML();
 
-            file_put_contents( $dashboardPath, $updatedContent );
+            file_put_contents($dashboardPath, $updatedContent);
         }
     }
 }
