@@ -159,6 +159,8 @@ After executing the command, Laravel SchemaForge will generate several files and
 
 + Furthermore, it ensures that API routes are also registered in the routes/web.php file. This enables you to access the API endpoints through both the API and web routes.
 
++ After successfully running the Laravel project, kindly proceed to access the following URL: domain/{tableName}. This URL will enable you to view the project's output or results.
+
 
 # Command: php artisan db:clone tableName
 
