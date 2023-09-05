@@ -22,6 +22,8 @@
 
 + **Automated User Interface Generation:** It generates CRUD (Create, Read, Edit) pages, automating the creation of user interfaces for displaying, editing, creating, and deleting data within your Laravel application.
 
++ **Generate Postman Collection:** SchemaForge includes a feature to generate a Postman collection for testing your API endpoints. This simplifies the process of creating and organizing API tests, ensuring the reliability and correctness of your Laravel application's API functionality.
+
 ## Benefits
 + **Efficiency:** Speed up your development workflow by seamlessly transitioning from schema design to code generation, data seeding, and schema cloning, all within a single package.
 
