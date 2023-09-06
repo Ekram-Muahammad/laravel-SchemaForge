@@ -45,63 +45,6 @@ class Postman
     }
 
 
-    // public function generateFormFields($fields, $tableName)
-    // {
-    //     $createFormFields = '';
-    //     foreach ($fields as $field) {
-    //         $createFormFields .= $this->generateFormField($field, 'create');
-    //     }
-
-    //     $createStub = file_get_contents(__DIR__ . '/stubs/views/create.stub');
-    //     $createView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/'], [$tableName, $createFormFields], $createStub);
-
-    //     $updateFormFields = '';
-    //     foreach ($fields as $field) {
-    //         $updateFormFields .= $this->generateFormField($field, 'update');
-    //     }
-
-    //     $updateStub = file_get_contents(__DIR__ . '/stubs/views/edit.stub');
-    //     $updateView = preg_replace(['/{{\s*tableName\s*}}/', '/{{\s*formFields\s*}}/', '/{{\s*varName\s*}}/'], [$tableName, $updateFormFields, Str::singular($tableName)], $updateStub);
-
-
-    //     $viewsDirectory = resource_path("views/pages/{$tableName}");
-    //     file_put_contents("{$viewsDirectory}/create.blade.php", $createView);
-    //     file_put_contents("{$viewsDirectory}/edit.blade.php", $updateView);
-    // }
-
-    // public function generateFormField($field, $action)
-    // {
-
-    //     $foreignFieldTypes = ['foreign', 'foreignId', 'unsignedBigInteger', 'foreignUuid', 'foreignUuidNullable'];
-
-    //     if (in_array($field['fieldType'], $foreignFieldTypes)) {
-    //         return $this->generateSelectField($field, $action);
-    //     } else {
-    //         switch ($field['fieldType']) {
-    //             case 'date':
-    //                 return $this->generateDateField($field, $action);
-    //             case 'datetime':
-    //                 return $this->generateDatetimeField($field, $action);
-    //             case 'text':
-    //             case 'longtext':
-    //                 return $this->generateTextareaField($field, $action);
-    //             case 'integer':
-    //             case 'bigint':
-    //             case 'smallint':
-    //             case 'float':
-    //             case 'double':
-    //                 return $this->generateNumberField($field, $action);
-    //             case 'enum':
-    //                 return $this->generateEnumField($field);
-    //             case 'boolean':
-    //                 return $this->generateBooleanField($field, $action);
-    //             default:
-    //                 return $this->generateTextField($field, $action);
-    //         }
-    //     }
-
-    // }
-
     public function generateFindRequest($tableName)
     {
 
