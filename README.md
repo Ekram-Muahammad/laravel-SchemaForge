@@ -45,7 +45,7 @@ Put following class in providers array of your config/app.php file:
 'providers' => 
 [ 
    // ... 
-   Ekram\SchemaForge\SchemaForgeServiceProvider, 
+   Ekram\SchemaForge\SchemaForgeServiceProvider::class,, 
 ];
 
 ```
