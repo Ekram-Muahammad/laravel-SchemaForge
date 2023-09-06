@@ -45,16 +45,9 @@ Put following class in providers array of your config/app.php file:
 'providers' => 
 [ 
    // ... 
-   Ekram\SchemaForge\SchemaForgeServiceProvider::class,, 
+   Ekram\SchemaForge\SchemaForgeServiceProvider::class,
 ];
 
-```
-
-Now run the following command to export files from vendor folder:
-
-
-```bash
-php artisan vendor:publish --provider="Ekram\SchemaForge\SchemaForgeServiceProvider"
 ```
 
 
