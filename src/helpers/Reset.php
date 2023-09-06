@@ -195,8 +195,6 @@ class Reset
                 foreach ($pElements as $pElement) {
                     if (trim($pElement->textContent) === $this->tableName) {
                         $liElement->parentNode->removeChild($liElement);
-                        break;
-                        // Stop further processing if the element is removed
                     }
                 }
             }
