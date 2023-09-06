@@ -36,7 +36,7 @@
 You can install this package via Composer. Run the following command:
 
 ```bash
-composer require SchemaForgeServiceProvider
+composer require ekram/schema-forge dev-main
 ```
 
 Put following class in providers array of your config/app.php file:
