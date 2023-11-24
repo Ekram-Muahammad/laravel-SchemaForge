@@ -202,7 +202,6 @@ At Laravel SchemaForge, we understand that your project might have unique requir
 To explore these options or discuss your customization needs, please feel free to contact us:
 
 - Email: [ekram.developer@gmail.com](mailto:ekram.developer@gmail.com)
-- Phone: +964 750 180 4528
 
 We're committed to helping you achieve your project goals with Laravel SchemaForge, whether it's through our standard features or by providing custom solutions.
 This section encourages users to contact you if they require additional features or unique designs, emphasizing that you're open to customization and ready to assist with their specific project needs.
